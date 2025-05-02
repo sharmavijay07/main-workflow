@@ -1,0 +1,32 @@
+/* Add the following to include Tailwind's base, components, and utilities */
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles or @layer directives */
+@layer base {
+  /* your custom base styles */
+  /* Add these to your global CSS or specific modal CSS */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
+  z-index: 999; /* Ensure the overlay is above other content */
+}
+
+.dialog-content {
+  position: relative;
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+  max-width: 525px;
+  z-index: 1000; /* Make sure it's above the backdrop */
+}
+
+}
+

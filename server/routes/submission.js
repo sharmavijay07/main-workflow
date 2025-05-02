@@ -1,0 +1,222 @@
+const express = require("express")
+const router = express.Router()
+const TaskSubmission = require("../models/TaskSubmission")
+const Task = require("../models/Task")
+const auth = require("../middleware/auth")
+
+// Get all submissions (admin only)
+router.get("/", async (req, res) => {
+  try {
+    // Only admins and managers can see all submissions
+    // if (req.user.role !== "Admin" && req.user.role !== "Manager") {
+    //   return res.status(403).json({ error: "Not authorized" })
+    // }
+
+    const submissions = await TaskSubmission.find().populate("task", "title status").populate("user", "name email")
+
+    res.json(submissions)
+  } catch (error) {
+    console.error("Error fetching submissions:", error)
+    res.status(500).json({ error: "Server error" })
+  }
+})
+
+// Get submission by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const submission = await TaskSubmission.findById(req.params.id)
+      .populate("task", "title status department assignee")
+      .populate("user", "name email")
+
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" })
+    }
+
+    // Check if user is authorized to view this submission
+    if (req.user.role !== "Admin" && req.user.role !== "Manager" && submission.user._id.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Not authorized" })
+    }
+
+    res.json(submission)
+  } catch (error) {
+    console.error("Error fetching submission:", error)
+    res.status(500).json({ error: "Server error" })
+  }
+})
+
+// Get submission by task ID
+router.get("/task/:taskId", async (req, res) => {
+  try {
+    const submission = await TaskSubmission.findOne({ task: req.params.taskId })
+      .populate("task", "title status")
+      .populate("user", "name email")
+
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" })
+    }
+
+    res.json(submission)
+  } catch (error) {
+    console.error("Error fetching submission by task:", error)
+    res.status(500).json({ error: "Server error" })
+  }
+})
+
+// Create new submission
+router.post("/", auth, async (req, res) => {
+  try {
+    const { task: taskId, githubLink, originalSubmission } = req.body;
+
+    // Check if task exists
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    // Check if user is assigned to this task
+    if (task.assignee.toString() !== req.user.id) {
+      return res.status(403).json({ error: "You can only submit tasks assigned to you" });
+    }
+
+    // If it's an original submission (not a revision)
+    if (!originalSubmission) {
+      const existingSubmission = await TaskSubmission.findOne({
+        task: taskId,
+        originalSubmission: { $exists: false }, // Only check for original submission
+      });
+
+      if (existingSubmission) {
+        return res.status(400).json({ error: "A submission already exists for this task" });
+      }
+    }
+
+    // Create new submission (original or revision)
+    const newSubmission = new TaskSubmission({
+      ...req.body,
+      user: req.user.id,
+    });
+
+    const submission = await newSubmission.save();
+
+    // Update task status to "Completed" only for original submission
+    if (!originalSubmission && task.status !== "Completed") {
+      task.status = "Completed";
+      task.progress = 100;
+      await task.save();
+    }
+
+    // Emit socket event for real-time updates
+    req.io.emit("submission-created", {
+      submission,
+      taskId,
+    });
+
+    res.status(201).json(submission);
+  } catch (error) {
+    console.error("Error creating submission:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+// Update submission
+router.put("/:id", auth, async (req, res) => {
+  try {
+    const submission = await TaskSubmission.findById(req.params.id)
+
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" })
+    }
+
+    // Check if user is authorized to update this submission
+    if (submission.user.toString() !== req.user.id && req.user.role !== "Admin") {
+      return res.status(403).json({ error: "Not authorized" })
+    }
+
+    // Update submission
+    const updatedSubmission = await TaskSubmission.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
+      .populate("task", "title status")
+      .populate("user", "name email")
+
+    // Emit socket event for real-time updates
+    req.io.emit("submission-updated", updatedSubmission)
+
+    res.json(updatedSubmission)
+  } catch (error) {
+    console.error("Error updating submission:", error)
+    res.status(500).json({ error: "Server error" })
+  }
+})
+
+// Review submission (admin/manager only)
+router.put("/:id/review", async (req, res) => {
+  try {
+    // Only admins and managers can review submissions
+    // if (req.user.role !== "Admin" && req.user.role !== "Manager") {
+    //   return res.status(403).json({ error: "Not authorized" })
+    // }
+
+    const { status, feedback } = req.body
+
+    if (!status || !["Approved", "Rejected"].includes(status)) {
+      return res.status(400).json({ error: "Invalid status" })
+    }
+
+    const submission = await TaskSubmission.findById(req.params.id)
+
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" })
+    }
+
+    // Update submission status and feedback
+    submission.status = status
+    submission.feedback = feedback
+    await submission.save()
+
+    // If approved, ensure task is marked as completed
+    if (status === "Approved") {
+      const task = await Task.findById(submission.task)
+      if (task && task.status !== "Completed") {
+        task.status = "Completed"
+        task.progress = 100
+        await task.save()
+      }
+    }
+
+    // Emit socket event for real-time updates
+    req.io.emit("submission-reviewed", submission)
+
+    res.json(submission)
+  } catch (error) {
+    console.error("Error reviewing submission:", error)
+    res.status(500).json({ error: "Server error" })
+  }
+})
+
+// Delete submission
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const submission = await TaskSubmission.findById(req.params.id)
+
+    if (!submission) {
+      return res.status(404).json({ error: "Submission not found" })
+    }
+
+    // Check if user is authorized to delete this submission
+    if (submission.user.toString() !== req.user.id && req.user.role !== "Admin") {
+      return res.status(403).json({ error: "Not authorized" })
+    }
+
+    await TaskSubmission.findByIdAndDelete(req.params.id)
+
+    // Emit socket event for real-time updates
+    req.io.emit("submission-deleted", req.params.id)
+
+    res.json({ message: "Submission deleted successfully" })
+  } catch (error) {
+    console.error("Error deleting submission:", error)
+    res.status(500).json({ error: "Server error" })
+  }
+})
+
+module.exports = router
