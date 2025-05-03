@@ -257,10 +257,10 @@ function UserDashboard() {
             <RefreshCw className="mr-2 h-4 w-4" />
             Refresh
           </Button>
-          <Button onClick={() => setIsCreateTaskOpen(true)}>
+          {/* <Button onClick={() => setIsCreateTaskOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Task
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -561,7 +561,7 @@ function UserDashboard() {
         </TabsContent>
       </Tabs>
 
-      <CreateTaskDialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen} />
+      {/* <CreateTaskDialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen} /> */}
 
       {/* Submission Details Dialog */}
      
