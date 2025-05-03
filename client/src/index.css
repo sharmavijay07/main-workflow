@@ -30,3 +30,13 @@
 
 }
 
+/* Add this to your global CSS file */
+body.sidebar-open {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .sidebar-open .fixed {
+    visibility: visible;
+  }
+}
