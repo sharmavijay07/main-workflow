@@ -22,8 +22,8 @@ import CompletedTasks from "./pages/CompletedTasks"
 
 function App() {
 
-  // const user = JSON.parse(localStorage.getItem("WorkflowUser") || "{}");
-  // const isAdmin = user?.role === "admin"; // Assuming role is stored in the user 
+  const user = JSON.parse(localStorage.getItem("WorkflowUser") || "{}");
+  const isAdmin = user?.role === "Admin"; // Assuming role is stored in the user 
   return (
     <ThemeProvider defaultTheme="system" storageKey="workflow-theme">
       <Router>
@@ -39,7 +39,11 @@ function App() {
                   {/* Protected Routes */}
                   <Route
                     path="/"
-                    element={
+                    element={ isAdmin? 
+                     
+                        <Navigate to="/dashboard" replace />
+                     
+                      :
                       <ProtectedRoute>
                         <Navigate to="/userdashboard" replace />
                       </ProtectedRoute>
