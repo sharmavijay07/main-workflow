@@ -654,130 +654,138 @@ const CompletedTasks = () => {
       </Tabs>
 
       {/* Review Submission Dialog */}
-      
-      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen} className="dialog-overlay">
-        <DialogContent className="dialog-content sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>Review Task Submission</DialogTitle>
-            <DialogDescription>Review and provide feedback on this task submission.</DialogDescription>
-          </DialogHeader>
+       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen} className="dialog-overlay">
+  <DialogContent
+    className="dialog-content sm:max-w-[525px] max-w-full sm:max-w-[525px] w-[90vw] max-h-[90vh] overflow-y-auto"
+  >
+    <DialogHeader>
+      <DialogTitle>Review Task Submission</DialogTitle>
+      <DialogDescription>
+        Review and provide feedback on this task submission.
+      </DialogDescription>
+    </DialogHeader>
 
-          {selectedSubmission && (
-            <div className="space-y-6 py-4">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Task Information</h3>
-                  <div className="bg-muted p-3 rounded-lg">
-                    <h4 className="font-medium">{selectedSubmission.task?.title}</h4>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {selectedSubmission.task?.description}
-                    </p>
-                  </div>
+    {selectedSubmission && (
+      <div className="space-y-6 py-4">
+        <div className="space-y-4">
+          {/* Task Info */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Task Information</h3>
+            <div className="bg-muted p-3 rounded-lg">
+              <h4 className="font-medium">{selectedSubmission.task?.title}</h4>
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                {selectedSubmission.task?.description}
+              </p>
+            </div>
+          </div>
+
+          {/* Submission Details */}
+          <div>
+            <h3 className="text-sm font-medium mb-2">Submission Details</h3>
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2 break-all">
+                <Github className="h-4 w-4" />
+                <a
+                  href={selectedSubmission.githubLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                >
+                  {selectedSubmission.githubLink}
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+
+              {selectedSubmission.additionalLinks && (
+                <div className="flex flex-wrap items-center gap-2 break-all">
+                  <Link2 className="h-4 w-4" />
+                  <a
+                    href={selectedSubmission.additionalLinks}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                  >
+                    {selectedSubmission.additionalLinks}
+                  </a>
                 </div>
+              )}
 
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Submission Details</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Github className="h-4 w-4" />
-                      <a
-                        href={selectedSubmission.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                      >
-                        {selectedSubmission.githubLink}
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </div>
-
-                    {selectedSubmission.additionalLinks && (
-                      <div className="flex items-center gap-2">
-                        <Link2 className="h-4 w-4" />
-                        <a
-                          href={selectedSubmission.additionalLinks}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                        >
-                          {selectedSubmission.additionalLinks}
-                        </a>
-                      </div>
-                    )}
-
-                    {selectedSubmission.notes && (
-                      <div className="bg-muted p-3 rounded-lg mt-2">
-                        <h4 className="text-sm font-medium mb-1">Notes from Submitter:</h4>
-                        <p className="text-sm whitespace-pre-line">{selectedSubmission.notes}</p>
-                      </div>
-                    )}
-
-                    <div className="text-sm text-muted-foreground">
-                      Submitted on {new Date(selectedSubmission.createdAt).toLocaleString()}
-                    </div>
-                  </div>
+              {selectedSubmission.notes && (
+                <div className="bg-muted p-3 rounded-lg mt-2">
+                  <h4 className="text-sm font-medium mb-1">Notes from Submitter:</h4>
+                  <p className="text-sm whitespace-pre-line">{selectedSubmission.notes}</p>
                 </div>
+              )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="review-status">Review Decision</Label>
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant={reviewData.status === "Approved" ? "default" : "outline"}
-                      className={
-                        reviewData.status === "Approved"
-                          ? "flex-1 bg-green-600 hover:bg-green-700"
-                          : "flex-1 border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/30"
-                      }
-                      onClick={() => setReviewData({ ...reviewData, status: "Approved" })}
-                    >
-                      <ThumbsUp className="mr-2 h-4 w-4" /> Approve
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={reviewData.status === "Rejected" ? "default" : "outline"}
-                      className={
-                        reviewData.status === "Rejected"
-                          ? "flex-1 bg-red-600 hover:bg-red-700"
-                          : "flex-1 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
-                      }
-                      onClick={() => setReviewData({ ...reviewData, status: "Rejected" })}
-                    >
-                      <ThumbsDown className="mr-2 h-4 w-4" /> Reject
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="feedback">Feedback (Optional)</Label>
-                  <Textarea
-                    id="feedback"
-                    placeholder="Provide feedback to the submitter..."
-                    value={reviewData.feedback}
-                    onChange={(e) => setReviewData({ ...reviewData, feedback: e.target.value })}
-                    rows={4}
-                  />
-                </div>
+              <div className="text-sm text-muted-foreground">
+                Submitted on {new Date(selectedSubmission.createdAt).toLocaleString()}
               </div>
             </div>
-          )}
+          </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleReviewSubmission} disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
-                </>
-              ) : (
-                <>Submit Review</>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          {/* Review Decision */}
+          <div className="space-y-2">
+            <Label htmlFor="review-status">Review Decision</Label>
+            <div className="flex gap-2 flex-col sm:flex-row">
+              <Button
+                type="button"
+                variant={reviewData.status === "Approved" ? "default" : "outline"}
+                className={
+                  reviewData.status === "Approved"
+                    ? "flex-1 bg-green-600 hover:bg-green-700"
+                    : "flex-1 border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/30"
+                }
+                onClick={() => setReviewData({ ...reviewData, status: "Approved" })}
+              >
+                <ThumbsUp className="mr-2 h-4 w-4" /> Approve
+              </Button>
+              <Button
+                type="button"
+                variant={reviewData.status === "Rejected" ? "default" : "outline"}
+                className={
+                  reviewData.status === "Rejected"
+                    ? "flex-1 bg-red-600 hover:bg-red-700"
+                    : "flex-1 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
+                }
+                onClick={() => setReviewData({ ...reviewData, status: "Rejected" })}
+              >
+                <ThumbsDown className="mr-2 h-4 w-4" /> Reject
+              </Button>
+            </div>
+          </div>
+
+          {/* Feedback */}
+          <div className="space-y-2">
+            <Label htmlFor="feedback">Feedback (Optional)</Label>
+            <Textarea
+              id="feedback"
+              placeholder="Provide feedback to the submitter..."
+              value={reviewData.feedback}
+              onChange={(e) => setReviewData({ ...reviewData, feedback: e.target.value })}
+              rows={4}
+            />
+          </div>
+        </div>
+      </div>
+    )}
+
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
+        Cancel
+      </Button>
+      <Button onClick={handleReviewSubmission} disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+          </>
+        ) : (
+          <>Submit Review</>
+        )}
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </div>
   )
 }
