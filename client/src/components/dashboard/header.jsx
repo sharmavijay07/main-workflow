@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { Search } from "lucide-react"
 import { Button } from "../ui/button"
@@ -11,26 +13,24 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import  ModeToggle  from "../mode-toggle"
+import { ModeToggle } from "../mode-toggle"
 import { NotificationsPopover } from "../notifications/notifications-popover"
-import { useAuth } from "@/context/auth-context"
-import { Menu } from "lucide-react"  // Importing the menu icon
+import { useAuth } from "../../context/auth-context"
+import { MobileMenuButton } from "../ui/mobile-menu-button"
 
-export function DashboardHeader({ onSidebarToggle }) {
+export function DashboardHeader({ sidebarOpen, onSidebarToggle }) {
   const [searchQuery, setSearchQuery] = useState("")
   const { user } = useAuth()
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur-lg">
-      <div className="flex h-16 items-center px-4 md:px-6">
-        {/* Hamburger Menu for small screens */}
-        <div className="md:hidden">
-          <Button variant="ghost" onClick={onSidebarToggle} className="h-8 w-8">
-            <Menu className="h-5 w-5 text-muted-foreground" />
-          </Button>
+      <div className="flex h-16 items-center justify-between px-4 md:px-6">
+        {/* Mobile Menu Button */}
+        <div className="block md:hidden z-50">
+          <MobileMenuButton isOpen={sidebarOpen} onClick={onSidebarToggle} className="mr-3" />
         </div>
 
-        <div className="relative max-w-md flex-1 hidden md:block">
+        <div className="relative max-w-md flex-1 hidden md:flex">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
@@ -49,7 +49,7 @@ export function DashboardHeader({ onSidebarToggle }) {
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                  <AvatarFallback>{user?.name}</AvatarFallback>
+                  <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -60,8 +60,8 @@ export function DashboardHeader({ onSidebarToggle }) {
             >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.name}</p>
-                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                  <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user?.email || "user@example.com"}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
