@@ -4,6 +4,7 @@ const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
 const jwt = require("jsonwebtoken");
+const path = require('path')
 
 // Import routes
 const taskRoutes = require("./routes/tasks");
@@ -17,7 +18,8 @@ const submissionRoutes = require('./routes/submission');
 const aiNewRoutes = require('./routes/aiRoutes');
 const progressRoutes = require('./routes/progress'); // Add this line
 const notificationRoutes = require('./routes/notifications'); // Add this line
-// const aiRoutePy = require('./routes/aiRoutePy')
+const aimRoutes = require('./routes/aim');
+
 // Create Express app
 const app = express();
 
@@ -25,24 +27,24 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ['http://localhost:5173','http://192.168.1.2:5173','https://main-workflow.vercel.app'],  // Replace with your frontend's URL
+    origin: ['http://localhost:5173','http://192.168.1.2:5173',''],
     methods: ['GET', 'POST'],
-    credentials: true,  // Allow credentials (cookies, HTTP authentication)
+    credentials: true,
   },
 });
 
 // CORS Configuration
 const corsOptions = {
-  origin: ['http://localhost:5173','http://192.168.1.2:5173','https://main-workflow.vercel.app'],  // Replace with your frontend's URL
+  origin: ['http://localhost:5173','http://192.168.1.2:5173'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,  // Allow credentials (cookies, HTTP authentication)
+  credentials: true,
 };
 app.use(cors(corsOptions));
 
 app.use(express.json());
 
 // Connect to MongoDB
-require('dotenv').config();  // Add this line at the top
+require('dotenv').config();
 
 // Connect to MongoDB
 mongoose
@@ -88,6 +90,7 @@ app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
+
 // Routes
 app.use("/api/tasks", taskRoutes);
 app.use("/api/departments", departmentRoutes);
@@ -100,9 +103,7 @@ app.use("/api/submissions", submissionRoutes);
 app.use('/api/new/ai', aiNewRoutes);
 app.use('/api/progress', progressRoutes); // Add this line
 app.use('/api/notifications', notificationRoutes); // Add this line
-// app.use('/api/new/ai',aiRoutePy)
-
-
+app.use('/api/aims', aimRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
