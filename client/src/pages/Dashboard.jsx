@@ -3,19 +3,22 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button"
-import { Plus, Loader2 } from "lucide-react"
+import { Plus, Loader2, Mail, FileText } from 'lucide-react'
 import { useNavigate } from "react-router-dom"
 import { CreateTaskDialog } from "../components/tasks/create-task-dialog"
 import { DepartmentStats } from "../components/dashboard/department-stats"
 import { TasksOverview } from "../components/dashboard/tasks-overview"
 import { AIInsights } from "../components/dashboard/ai-insights"
 import { RecentActivity } from "../components/dashboard/recent-activity"
-import { api } from "../lib/api"
+import { api, API_URL } from "../lib/api"
 import { useToast } from "../hooks/use-toast"
+import { useAuth } from "../context/auth-context"
+import axios from "axios"
 
 function Dashboard() {
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { user } = useAuth()
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false)
   const [stats, setStats] = useState({
     totalTasks: 0,
@@ -28,6 +31,10 @@ function Dashboard() {
     pendingTasksChange: 0,
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [isSendingReminders, setIsSendingReminders] = useState(false)
+  const [isGeneratingReports, setIsGeneratingReports] = useState(false)
+
+  const isAdmin = user && (user.role === "Admin" || user.role === "Manager")
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -50,6 +57,50 @@ function Dashboard() {
     fetchDashboardData()
   }, [toast])
 
+  const handleBroadcastReminders = async () => {
+    try {
+      setIsSendingReminders(true)
+      const result = await api.notifications.broadcastReminders()
+      toast({
+        title: "Success",
+        description: `Sent ${result.emails.length} reminder emails to users`,
+        variant: "success",
+      })
+    } catch (error) {
+      console.error("Error sending reminders:", error)
+      toast({
+        title: "Error",
+        description: "Failed to send reminder emails",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSendingReminders(false)
+    }
+  }
+
+  const handleGenerateReports = async () => {
+    try {
+      setIsGeneratingReports(true)
+      const result = await axios.post(`${API_URL}/notifications/generate-reports/${user.id}`)
+      
+      toast({
+        title: "Success",
+        description: `Generated ${result.data.reports.length} department reports and sent to your email`,
+        variant: "success",
+      })
+    } catch (error) {
+      console.error("Error generating reports:", error)
+      toast({
+        title: "Error",
+        description: "Failed to generate department reports",
+        variant: "destructive",
+      })
+    } finally {
+      setIsGeneratingReports(false)
+    }
+  }
+  
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
@@ -63,15 +114,47 @@ function Dashboard() {
 
   return (
     <div className="h-screen flex flex-col space-y-6 overflow-y-auto px-4 md:px-6 py-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back! Here's an overview of your workflow.</p>
         </div>
-        <Button onClick={() => setIsCreateTaskOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Task
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={() => setIsCreateTaskOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Task
+          </Button>
+          
+          {isAdmin && (
+            <>
+              <Button 
+                variant="outline" 
+                onClick={handleBroadcastReminders}
+                disabled={isSendingReminders}
+              >
+                {isSendingReminders ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="mr-2 h-4 w-4" />
+                )}
+                Broadcast Reminders
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                onClick={handleGenerateReports}
+                disabled={isGeneratingReports}
+              >
+                {isGeneratingReports ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="mr-2 h-4 w-4" />
+                )}
+                Generate Reports
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
