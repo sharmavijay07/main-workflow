@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ children }) => {
 
   if (user.role === "User") {
     // Allow access to /userdashboard and /tasks/* (including /tasks/:id)
-    if (location.pathname !== "/userdashboard" && !location.pathname.startsWith("/tasks/")) {
+    if (location.pathname !== "/userdashboard" && !location.pathname.startsWith("/tasks/") && location.pathname !== "/progress") {
       return <Navigate to="/userdashboard" replace />
     }
   }
