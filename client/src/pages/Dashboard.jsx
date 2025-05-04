@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button"
-import { Plus, Loader2, Mail, FileText } from 'lucide-react'
+import { Plus, Loader2, Mail, FileText ,Target} from 'lucide-react'
 import { useNavigate } from "react-router-dom"
 import { CreateTaskDialog } from "../components/tasks/create-task-dialog"
 import { DepartmentStats } from "../components/dashboard/department-stats"
@@ -14,6 +14,8 @@ import { api, API_URL } from "../lib/api"
 import { useToast } from "../hooks/use-toast"
 import { useAuth } from "../context/auth-context"
 import axios from "axios"
+
+
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -33,6 +35,7 @@ function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSendingReminders, setIsSendingReminders] = useState(false)
   const [isGeneratingReports, setIsGeneratingReports] = useState(false)
+  const [isSendingAimReminders, setIsSendingAimReminders] = useState(false)
 
   const isAdmin = user && (user.role === "Admin" || user.role === "Manager")
 
@@ -99,6 +102,26 @@ function Dashboard() {
       setIsGeneratingReports(false)
     }
   }
+  const handleBroadcastAimReminders = async () => {
+    try {
+      setIsSendingAimReminders(true)
+      const result = await api.notifications.broadcastAimReminders()
+      toast({
+        title: "Success",
+        description: `Sent ${result.emails.length} aim reminder emails to users`,
+        variant: "success",
+      })
+    } catch (error) {
+      console.error("Error sending aim reminders:", error)
+      toast({
+        title: "Error",
+        description: "Failed to send aim reminder emails",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSendingAimReminders(false)
+    }
+  }
   
 
   if (isLoading) {
@@ -154,6 +177,15 @@ function Dashboard() {
               </Button>
             </>
           )}
+
+<Button variant="outline" onClick={handleBroadcastAimReminders} disabled={isSendingAimReminders}>
+          {isSendingAimReminders ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Target className="mr-2 h-4 w-4" />
+          )}
+          Broadcast Aim Reminders
+        </Button>
         </div>
       </div>
 
