@@ -11,10 +11,12 @@ const departmentRoutes = require("./routes/departments");
 const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const aiRoutes = require("./routes/ai");
-const adminRoutes = require('./routes/admin')
-const dashboardRoutes = require('./routes/dashboard')
-const submissionRoutes = require('./routes/submission')
-const aiNewRoutes = require('./routes/aiRoutes')
+const adminRoutes = require('./routes/admin');
+const dashboardRoutes = require('./routes/dashboard');
+const submissionRoutes = require('./routes/submission');
+const aiNewRoutes = require('./routes/aiRoutes');
+const progressRoutes = require('./routes/progress'); // Add this line
+const notificationRoutes = require('./routes/notifications'); // Add this line
 // const aiRoutePy = require('./routes/aiRoutePy')
 // Create Express app
 const app = express();
@@ -81,8 +83,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/submissions",submissionRoutes)
-app.use('/api/new/ai',aiNewRoutes)
+app.use("/api/submissions", submissionRoutes);
+app.use('/api/new/ai', aiNewRoutes);
+app.use('/api/progress', progressRoutes); // Add this line
+app.use('/api/notifications', notificationRoutes); // Add this line
 // app.use('/api/new/ai',aiRoutePy)
 
 
