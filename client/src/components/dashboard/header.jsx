@@ -21,18 +21,18 @@ import { MobileMenuButton } from "../ui/mobile-menu-button"
 export function DashboardHeader({ sidebarOpen, onSidebarToggle }) {
   const [searchQuery, setSearchQuery] = useState("")
   const { user } = useAuth()
-  const isUser = user?.role === 'User'
+  
 
   return (
     <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur-lg">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
          {/* Mobile Menu Button */}
-        {
-          isUser?'':
+        
+        
           <div className="block md:hidden z-50">
           <MobileMenuButton isOpen={sidebarOpen} onClick={onSidebarToggle} className="mr-3" />
         </div>
-        }
+        
 
         <div className="relative max-w-md flex-1 hidden md:flex">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
