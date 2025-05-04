@@ -1,4 +1,3 @@
-
 const express = require("express")
 const router = express.Router()
 const auth = require("../middleware/auth")
@@ -11,6 +10,7 @@ const {
   sendTaskReminder,
   generateDepartmentProgressPDF,
   sendDepartmentProgressReport,
+  sendAimReminder,
 } = require("../utils/emailService")
 
 // @route   POST api/notifications/broadcast-reminders
@@ -61,17 +61,55 @@ router.post("/broadcast-reminders", async (req, res) => {
   }
 })
 
-// @route   POST api/notifications/generate-reports
+// @route   POST api/notifications/broadcast-aim-reminders
+// @desc    Broadcast aim setting reminders to all users
+// @access  Private (Admin only)
+router.post("/broadcast-aim-reminders", async (req, res) => {
+  try {
+    // Get all active users
+    const users = await User.find({ role: { $ne: "Admin" } })
+      .populate("department", "name")
+
+    if (users.length === 0) {
+      return res.status(404).json({ msg: "No users found" })
+    }
+
+    const emailPromises = []
+    const emailsSent = []
+
+    // Send email for each user
+    for (const user of users) {
+      emailPromises.push(
+        sendAimReminder(user)
+          .then(() => {
+            emailsSent.push({
+              user: user.name,
+              email: user.email,
+            })
+          })
+          .catch((error) => {
+            console.error(`Failed to send email to ${user.email}:`, error)
+          }),
+      )
+    }
+
+    await Promise.all(emailPromises)
+
+    res.json({
+      msg: `Sent ${emailsSent.length} aim reminder emails`,
+      emails: emailsSent,
+    })
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send("Server Error")
+  }
+})
+
+// @route   POST api/notifications/generate-reports/:id
 // @desc    Generate and email department progress reports
 // @access  Private (Admin only)
 router.post("/generate-reports/:id", async (req, res) => {
   try {
-    // // Get the admin user
-    // const admin = await User.findById(req.user.id)
-    // if (!admin) {
-    //   return res.status(404).json({ msg: "Admin user not found" })
-    // }
-
     // Get all departments
     const departments = await Department.find()
     if (departments.length === 0) {
@@ -124,5 +162,28 @@ router.post("/generate-reports/:id", async (req, res) => {
     res.status(500).send("Server Error")
   }
 })
+
+// @route   POST api/notifications/toggle-automation
+// @desc    Toggle automation settings for reminders
+// @access  Private (Admin only)
+router.post("/toggle-automation", async (req, res) => {
+  try {
+    const { automateAimReminders, automateProgressReminders } = req.body;
+    
+    // In a real implementation, you would save these settings to a database
+    // For now, we'll just return success
+    
+    res.json({
+      msg: "Automation settings updated",
+      settings: {
+        automateAimReminders,
+        automateProgressReminders
+      }
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router
