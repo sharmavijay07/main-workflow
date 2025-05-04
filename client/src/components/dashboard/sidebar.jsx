@@ -1,5 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
-import { LayoutDashboard, CheckSquare, Network, Users, Sparkles, Settings, LogOut, CheckCircle, BarChart, Airplay, LayoutDashboardIcon } from "lucide-react"; 
+import { LayoutDashboard, CheckSquare, Network, Users, Sparkles, Settings, LogOut, CheckCircle, BarChart, Airplay, LayoutDashboardIcon, Target } from "lucide-react"; 
 import { useAuth } from "@/context/auth-context";
 
 export function DashboardSidebar() {
