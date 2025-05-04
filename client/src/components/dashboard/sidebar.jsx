@@ -1,8 +1,10 @@
-import { useLocation, Link } from "react-router-dom"
-import { LayoutDashboard, CheckSquare, Network, Users, Sparkles, Settings, LogOut, CheckCircle } from "lucide-react"
+import { useLocation, Link } from "react-router-dom";
+import { LayoutDashboard, CheckSquare, Network, Users, Sparkles, Settings, LogOut, CheckCircle, BarChart, Airplay, LayoutDashboardIcon } from "lucide-react"; 
+import { useAuth } from "@/context/auth-context";
 
 export function DashboardSidebar() {
-  const location = useLocation()
+  const location = useLocation();
+  const { user, logout } = useAuth();
 
   const routes = [
     { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -11,7 +13,16 @@ export function DashboardSidebar() {
     { title: "Departments", href: "/departments", icon: Users },
     { title: "AI Optimization", href: "/optimization", icon: Sparkles },
     { title: "Completed Tasks", href: "/completedtask", icon: CheckCircle },
-  ]
+  ];
+
+  // Only show these routes if the user is an admin
+  const userRoutes = [
+    { title: "Dashboard", href: "/userdashboard", icon: LayoutDashboardIcon },
+    { title: "Progress", href: "/progress", icon: BarChart },
+    { title: "Set Aims", href: "/aims", icon: Airplay },
+  ];
+
+  const renderRoutes = user?.role === "User" ? userRoutes : routes;
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-gray-900 text-black dark:text-white">
@@ -29,7 +40,7 @@ export function DashboardSidebar() {
           <div className="mb-6">
             <div className="text-sm font-medium text-muted-foreground dark:text-gray-400 mb-2">Navigation</div>
             <nav className="space-y-1">
-              {routes.map((route) => (
+              {renderRoutes.map((route) => (
                 <Link
                   key={route.href}
                   to={route.href}
@@ -64,12 +75,15 @@ export function DashboardSidebar() {
             <Settings className="h-5 w-5" />
             <span>Settings</span>
           </Link>
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800">
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
