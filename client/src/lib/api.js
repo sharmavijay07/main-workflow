@@ -59,7 +59,11 @@ const tasks = {
   getTasks: (filters = {}) => {
     const queryParams = new URLSearchParams()
     Object.entries(filters).forEach(([key, value]) => {
-      if (value) queryParams.append(key, value)
+      if (Array.isArray(value)) {
+        value.forEach(val => queryParams.append(key, val))
+      } else if (value) {
+        queryParams.append(key, value)
+      }
     })
 
     const queryString = queryParams.toString()
