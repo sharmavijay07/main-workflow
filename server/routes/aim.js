@@ -40,7 +40,7 @@ router.get("/", async (req, res) => {
 // @route   GET api/aims/today
 // @desc    Get user's aim for today
 // @access  Private
-router.get("/today", async (req, res) => {
+router.get("/today/:id", async (req, res) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -49,7 +49,7 @@ router.get("/today", async (req, res) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     const aim = await Aim.findOne({
-      user: req.user.id,
+      user: req.params.id,
       date: {
         $gte: today,
         $lt: tomorrow
@@ -89,68 +89,79 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// @route   POST api/aims
+// @route   POST api/aims/postaim/:id
 // @desc    Create or update today's aim
 // @access  Private
-router.post("/", async (req, res) => {
-  try {
-    const { aims } = req.body;
-    
-    if (!aims) {
-      return res.status(400).json({ error: "Aims are required" });
-    }
-    
-    // Get today's date (start of day)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    // Check if user already has an aim for today
-    let aim = await Aim.findOne({
-      user: req.user.id,
-      date: {
-        $gte: today,
-        $lt: tomorrow
+router.post("/postaim/:id", async (req, res) => {
+    try {
+      const { aims } = req.body
+      const userId = req.params.id
+  
+      if (!userId) {
+        return res.status(400).json({ error: "User ID is required" })
       }
-    });
-    
-    const user = await User.findById(req.user.id);
-    
-    if (aim) {
-      // Update existing aim
-      aim.aims = aims;
-      aim.updatedAt = Date.now();
-    } else {
-      // Create new aim
-      aim = new Aim({
-        user: req.user.id,
-        department: user.department,
-        aims,
-        date: today
-      });
+  
+      if (!aims) {
+        return res.status(400).json({ error: "Aims are required" })
+      }
+  
+      // Get today's date (start of day)
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+  
+      const tomorrow = new Date(today)
+      tomorrow.setDate(tomorrow.getDate() + 1)
+  
+      // Check if user already has an aim for today
+      let aim = await Aim.findOne({
+        user: userId,
+        date: {
+          $gte: today,
+          $lt: tomorrow,
+        },
+      })
+  
+      const user = await User.findById(userId)
+      if (!user) {
+        return res.status(404).json({ error: "User not found" })
+      }
+  
+      if (aim) {
+        // Update existing aim
+        aim.aims = aims
+        aim.updatedAt = Date.now()
+      } else {
+        // Create new aim
+        aim = new Aim({
+          user: userId,
+          department: user.department,
+          aims,
+          date: today,
+        })
+      }
+  
+      await aim.save()
+  
+      // Notify via Socket.IO
+      if (req.io) {
+        req.io.emit("aim-updated", {
+          aim,
+          user: {
+            id: userId,
+            name: user.name,
+          },
+        })
+      }
+  
+      res.json(aim)
+    } catch (error) {
+      console.error("Error creating/updating aim:", error)
+      res.status(500).json({ error: "Server error" })
     }
-    
-    await aim.save();
-    
-    // Notify via Socket.IO
-    if (req.io) {
-      req.io.emit("aim-updated", {
-        aim,
-        user: {
-          id: req.user.id,
-          name: user.name
-        }
-      });
-    }
-    
-    res.json(aim);
-  } catch (error) {
-    console.error("Error creating/updating aim:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
+  })
+  
+
+  
 
 // @route   PUT api/aims/:id
 // @desc    Update an aim
