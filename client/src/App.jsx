@@ -36,7 +36,7 @@ function App() {
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                  <Route path="/progress" element={<Progress />} />
+                 
 
                   {/* Protected Routes */}
                   <Route
@@ -59,6 +59,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   >
+                     <Route path="/progress" element={<Progress />} />
                     <Route
                       path="/dashboard"
                       element={
