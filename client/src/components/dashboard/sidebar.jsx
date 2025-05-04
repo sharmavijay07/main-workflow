@@ -12,6 +12,7 @@ export function DashboardSidebar() {
     { title: "Dependencies", href: "/dependencies", icon: Network },
     { title: "Departments", href: "/departments", icon: Users },
     { title: "AI Optimization", href: "/optimization", icon: Sparkles },
+     { title: "All Aims", href: "/all-aims", icon: Target },
     { title: "Completed Tasks", href: "/completedtask", icon: CheckCircle },
   ];
 
