@@ -20,6 +20,8 @@ import UserDashboard from "./pages/UserDashboard"
 import TaskDetails from "./pages/TaskDetails"
 import CompletedTasks from "./pages/CompletedTasks"
 import Progress from "./pages/Progress"
+import TodaysAim from "./pages/TodaysAim"
+import AllAims from "./pages/AllAims"
 
 function App() {
 
@@ -36,8 +38,10 @@ function App() {
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
-                 
 
+  
+                  
+                  
                   {/* Protected Routes */}
                   <Route
                     path="/"
@@ -59,7 +63,27 @@ function App() {
                       </ProtectedRoute>
                     }
                   >
-                     <Route path="/progress" element={<Progress />} />
+
+< Route
+path = "/all-aims"
+element={
+  <ProtectedRoute>
+      <AllAims />
+      </ProtectedRoute>
+  }
+/>
+
+<Route
+    path="/aims"
+    element={
+      <ProtectedRoute>
+        <TodaysAim />
+        </ProtectedRoute>
+    }
+  />
+
+<Route path="/progress" element={<Progress />} />
+
                     <Route
                       path="/dashboard"
                       element={
