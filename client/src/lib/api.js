@@ -230,9 +230,18 @@ const notifications = {
     fetchAPI("/notifications/broadcast-reminders", {
       method: "POST",
     }),
+  broadcastAimReminders: () =>
+    fetchAPI("/notifications/broadcast-aim-reminders", {
+      method: "POST",
+    }),
   generateReports: () =>
     fetchAPI("/notifications/generate-reports", {
       method: "POST",
+    }),
+  toggleAutomation: (settings) =>
+    fetchAPI("/notifications/toggle-automation", {
+      method: "POST",
+      body: JSON.stringify(settings),
     }),
 };
 
@@ -245,6 +254,69 @@ const dashboard = {
   getUserStats: (userId) => fetchAPI(`/dashboard/user-stats/${userId}`),
 }
 
+// Update only the aims section in the API client
+
+// const fetchAPI = async (url, options) => {
+//   const res = await fetch(url, {
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     ...options,
+//   })
+//   return await res.json()
+// }
+
+// Aims API
+const aims = {
+  getAims: (filters = {}) => {
+    const queryParams = new URLSearchParams()
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) queryParams.append(key, value)
+    })
+
+    const queryString = queryParams.toString()
+    return fetchAPI(`/aims${queryString ? `?${queryString}` : ""}`)
+  },
+  getTodayAim: (userId) => {
+    if (!userId) {
+      throw new Error("User ID is required")
+    }
+    return fetchAPI(`/aims/today/${userId}`)
+  },
+  getUserAims: (userId, filters = {}) => {
+    if (!userId) {
+      throw new Error("User ID is required")
+    }
+    const queryParams = new URLSearchParams()
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) queryParams.append(key, value)
+    })
+
+    const queryString = queryParams.toString()
+    return fetchAPI(`/aims/user/${userId}${queryString ? `?${queryString}` : ""}`)
+  },
+  createAim: (aim, userId) => {
+    if (!userId) {
+      throw new Error("User ID is required")
+    }
+    return fetchAPI(`/aims/postaim/${userId}`, {
+      method: "POST",
+      body: JSON.stringify(aim),
+    })
+  },
+  updateAim: (id, aim) =>
+    fetchAPI(`/aims/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(aim),
+    }),
+  deleteAim: (id) =>
+    fetchAPI(`/aims/${id}`, {
+      method: "DELETE",
+    }),
+}
+
+
+// Update the exported API object
 export const api = {
   auth,
   tasks,
@@ -255,6 +327,7 @@ export const api = {
   notifications,
   admin,
   dashboard,
+  aims,
 }
 
 export default api
