@@ -72,15 +72,15 @@ element={
       </ProtectedRoute>
   }
 />
-
 <Route
     path="/aims"
     element={
-      <ProtectedRoute>
+     
         <TodaysAim />
-        </ProtectedRoute>
+      
     }
   />
+
 
 <Route path="/progress" element={<Progress />} />
 
