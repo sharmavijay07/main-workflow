@@ -203,6 +203,39 @@ const admin = {
   },
 }
 
+
+// Progress API
+const progress = {
+  getTaskProgress: (taskId) => fetchAPI(`/progress/task/${taskId}`),
+  getUserProgress: (userId) => fetchAPI(`/progress/user/${userId}`),
+  createProgress: (progressData) =>
+    fetchAPI("/progress", {
+      method: "POST",
+      body: JSON.stringify(progressData),
+    }),
+  updateProgress: (id, progressData) =>
+    fetchAPI(`/progress/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(progressData),
+    }),
+  deleteProgress: (id) =>
+    fetchAPI(`/progress/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+// Notifications API
+const notifications = {
+  broadcastReminders: () =>
+    fetchAPI("/notifications/broadcast-reminders", {
+      method: "POST",
+    }),
+  generateReports: () =>
+    fetchAPI("/notifications/generate-reports", {
+      method: "POST",
+    }),
+};
+
 // Dashboard API
 const dashboard = {
   getStats: () => fetchAPI("/dashboard/stats"),
@@ -218,6 +251,8 @@ export const api = {
   departments,
   users,
   ai,
+  progress,
+  notifications,
   admin,
   dashboard,
 }
