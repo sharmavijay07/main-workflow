@@ -38,7 +38,7 @@ const sendTaskReminder = async (user, task) => {
           </div>
           <p>Please log in to the WorkflowAI system to update your progress.</p>
           <div style="margin-top: 20px;">
-            <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/progress" 
+            <a href="${process.env.FRONTEND_URL || "https://main-workflow.vercel.app"}/progress" 
                style="background-color: #3b82f6; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
               Update Progress
             </a>
@@ -464,7 +464,7 @@ const sendAimReminder = async (user) => {
             </div>
             <p>Please log in to the WorkflowAI system to set your aims for today.</p>
             <div style="margin-top: 20px;">
-              <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/aims" 
+              <a href="${process.env.FRONTEND_URL || "https://main-workflow.vercel.app"}/aims" 
                  style="background-color: #3b82f6; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
                 Set Today's Aims
               </a>
