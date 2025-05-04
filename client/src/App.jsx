@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/AdminDashboard"
 import UserDashboard from "./pages/UserDashboard"
 import TaskDetails from "./pages/TaskDetails"
 import CompletedTasks from "./pages/CompletedTasks"
+import Progress from "./pages/Progress"
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
                   {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/progress" element={<Progress />} />
 
                   {/* Protected Routes */}
                   <Route
@@ -65,6 +67,8 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
+
+
                     <Route
                       path="/admindashboard"
                       element={
