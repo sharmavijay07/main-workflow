@@ -4,7 +4,6 @@ const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
 const jwt = require("jsonwebtoken");
-const path = require('path')
 
 // Import routes
 const taskRoutes = require("./routes/tasks");
@@ -19,7 +18,7 @@ const aiNewRoutes = require('./routes/aiRoutes');
 const progressRoutes = require('./routes/progress'); // Add this line
 const notificationRoutes = require('./routes/notifications'); // Add this line
 const aimRoutes = require('./routes/aim');
-
+// const aiRoutePy = require('./routes/aiRoutePy')
 // Create Express app
 const app = express();
 
@@ -27,24 +26,24 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ['http://localhost:5173','http://192.168.1.2:5173',''],
+    origin: ['http://localhost:5173','http://192.168.1.2:5173','https://main-workflow.vercel.app'],  // Replace with your frontend's URL
     methods: ['GET', 'POST'],
-    credentials: true,
+    credentials: true,  // Allow credentials (cookies, HTTP authentication)
   },
 });
 
 // CORS Configuration
 const corsOptions = {
-  origin: ['http://localhost:5173','http://192.168.1.2:5173'],
+  origin: ['http://localhost:5173','http://192.168.1.2:5173','https://main-workflow.vercel.app'],  // Replace with your frontend's URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
+  credentials: true,  // Allow credentials (cookies, HTTP authentication)
 };
 app.use(cors(corsOptions));
 
 app.use(express.json());
 
 // Connect to MongoDB
-require('dotenv').config();
+require('dotenv').config();  // Add this line at the top
 
 // Connect to MongoDB
 mongoose
@@ -104,6 +103,10 @@ app.use('/api/new/ai', aiNewRoutes);
 app.use('/api/progress', progressRoutes); // Add this line
 app.use('/api/notifications', notificationRoutes); // Add this line
 app.use('/api/aims', aimRoutes);
+
+// app.use('/api/new/ai',aiRoutePy)
+
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
