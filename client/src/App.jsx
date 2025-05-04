@@ -75,9 +75,9 @@ element={
 <Route
     path="/aims"
     element={
-     
+     <ProtectedRoute>
         <TodaysAim />
-      
+      </ProtectedRoute>
     }
   />
 
