@@ -218,5 +218,49 @@ router.get("/user-stats/:userId", async (req, res) => {
     }
   });
   
+// @route   GET api/dashboard/progress-stats
+// @desc    Get progress statistics
+// @access  Private
+router.get("/progress-stats", auth, async (req, res) => {
+  try {
+    // Get tasks with due dates in the future
+    const now = new Date();
+    const upcomingTasks = await Task.find({
+      dueDate: { $gt: now },
+      status: { $ne: "Completed" },
+    }).populate("assignee", "name");
+    
+    // Calculate progress statistics
+    const progressStats = upcomingTasks.map(task => {
+      const totalDays = Math.ceil((new Date(task.dueDate) - new Date(task.createdAt)) / (1000 * 60 * 60 * 24));
+      const daysElapsed = Math.ceil((now - new Date(task.createdAt)) / (1000 * 60 * 60 * 24));
+      const daysRemaining = Math.ceil((new Date(task.dueDate) - now) / (1000 * 60 * 60 * 24));
+      
+      // Calculate expected progress based on time elapsed
+      const expectedProgress = Math.min(100, Math.round((daysElapsed / totalDays) * 100));
+      
+      // Calculate progress difference (actual vs expected)
+      const progressDifference = task.progress - expectedProgress;
+      
+      return {
+        id: task._id,
+        title: task.title,
+        assignee: task.assignee?.name || "Unassigned",
+        dueDate: task.dueDate,
+        actualProgress: task.progress,
+        expectedProgress,
+        progressDifference,
+        daysRemaining,
+        totalDays,
+        status: progressDifference >= 0 ? "On Track" : "Behind Schedule",
+      };
+    });
+    
+    res.json(progressStats);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router
