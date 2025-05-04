@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table"
 import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
@@ -19,7 +19,7 @@ import { useToast } from "../../hooks/use-toast"
 import { api } from "../../lib/api"
 import { useSocketContext } from "../../context/socket-context"
 
-export function TasksList() {
+export function TasksList({ filters }) {
   const { toast } = useToast()
   const { events } = useSocketContext()
   const [tasks, setTasks] = useState([])
@@ -29,12 +29,12 @@ export function TasksList() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Fetch tasks
+  // Fetch tasks based on filters
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         setIsLoading(true)
-        const data = await api.tasks.getTasks()
+        const data = await api.tasks.getTasks(filters)
         setTasks(data)
         setError(null)
       } catch (err) {
@@ -50,26 +50,36 @@ export function TasksList() {
     }
 
     fetchTasks()
-  }, [toast])
+  }, [filters, toast])
 
-  // Listen for socket events to update tasks
+  // Handle socket events for real-time updates
   useEffect(() => {
     if (events.length > 0) {
       const latestEvent = events[events.length - 1]
-      
-      if (latestEvent.type === 'task-created') {
+
+      // Apply filter checks for socket updates
+      const matchesFilters = (task) => {
+        const { status, department, priority } = filters
+        return (
+          (!status?.length || status.includes(task.status)) &&
+          (!department?.length || department.includes(task.department?._id)) &&
+          (!priority || priority === "all" || task.priority === priority)
+        )
+      }
+
+      if (latestEvent.type === 'task-created' && matchesFilters(latestEvent.data)) {
         setTasks(prev => [...prev, latestEvent.data])
       } 
       else if (latestEvent.type === 'task-updated') {
         setTasks(prev => prev.map(task => 
           task.id === latestEvent.data.id ? latestEvent.data : task
-        ))
+        ).filter(matchesFilters))
       }
       else if (latestEvent.type === 'task-deleted') {
         setTasks(prev => prev.filter(task => task.id !== latestEvent.data.id))
       }
     }
-  }, [events])
+  }, [events, filters])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -125,12 +135,22 @@ export function TasksList() {
     }
   }
 
+  // Group tasks by department
+  const groupedTasks = tasks.reduce((acc, task) => {
+    const deptName = task.department?.name || 'Unknown'
+    if (!acc[deptName]) {
+      acc[deptName] = []
+    }
+    acc[deptName].push(task)
+    return acc
+  }, {})
+
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>All Tasks</CardTitle>
-          <CardDescription>View and manage all tasks across departments</CardDescription>
+          <CardTitle>Tasks by Department</CardTitle>
+          <CardDescription>View tasks grouped by department</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center items-center py-10">
           <div className="flex flex-col items-center gap-2">
@@ -146,8 +166,8 @@ export function TasksList() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>All Tasks</CardTitle>
-          <CardDescription>View and manage all tasks across departments</CardDescription>
+          <CardTitle>Tasks by Department</CardTitle>
+          <CardDescription>View tasks grouped by department</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="p-4 text-center text-red-500">
@@ -166,85 +186,87 @@ export function TasksList() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>All Tasks</CardTitle>
-        <CardDescription>View and manage all tasks across departments</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {tasks.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No tasks found. Create a new task to get started.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Assignee</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Due Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tasks.map((task) => (
-                 <TableRow key={task.id ?? task.title}>
-
-                    <TableCell className="font-medium">{task.id}</TableCell>
-                    <TableCell>{task.title}</TableCell>
-                    <TableCell>{task.department?.name || 'Unknown'}</TableCell>
-                    <TableCell>{task.assignee?.name || 'Unassigned'}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
-                    </TableCell>
-                    <TableCell>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}</TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => handleViewTask(task)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit task
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="text-destructive"
-                            onClick={() => handleDeleteTask(task.id)}
-                            disabled={isDeleting}
-                          >
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete task
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </CardContent>
-
+    <div className="space-y-6">
+      {Object.keys(groupedTasks).length === 0 ? (
+        <Card>
+          <CardContent className="text-center py-8 text-muted-foreground">
+            <p>No tasks found matching the selected filters.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        Object.entries(groupedTasks).map(([deptName, deptTasks]) => (
+          <Card key={deptName}>
+            <CardHeader>
+              <CardTitle>{deptName} Tasks</CardTitle>
+              <CardDescription>Tasks assigned to the {deptName} department</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                     
+                      <TableHead>Title</TableHead>
+                      <TableHead>Assignee</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Due Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {deptTasks.map((task) => (
+                      <TableRow key={task._id ?? task.title}>
+                       
+                        <TableCell>{task.title}</TableCell>
+                        <TableCell>{task.assignee?.name || 'Unassigned'}</TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
+                        </TableCell>
+                        <TableCell>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}</TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => handleViewTask(task)}>
+                                <Eye className="mr-2 h-4 w-4" />
+                                View details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit task
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem 
+                                className="text-destructive"
+                                onClick={() => handleDeleteTask(task.id)}
+                                disabled={isDeleting}
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Delete task
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
       {selectedTask && <TaskDetailsDialog task={selectedTask} open={isDetailsOpen} onOpenChange={setIsDetailsOpen} />}
-    </Card>
+    </div>
   )
 }
