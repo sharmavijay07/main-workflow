@@ -6,12 +6,21 @@ const auth = require("../middleware/auth")
 // Get all tasks
 router.get("/", async (req, res) => {
   try {
-    const { department, status, dueDate } = req.query
+    const { department, status, priority, dueDate } = req.query
 
     // Build filter object
     const filter = {}
-    if (department) filter.department = department
-    if (status) filter.status = status
+    if (department) {
+      const deptArray = Array.isArray(department) ? department : department.split(",")
+      filter.department = { $in: deptArray }
+    }
+    if (status) {
+      const statusArray = Array.isArray(status) ? status : status.split(",")
+      filter.status = { $in: statusArray }
+    }
+    if (priority) {
+      filter.priority = priority
+    }
     if (dueDate) {
       const date = new Date(dueDate)
       filter.dueDate = {
