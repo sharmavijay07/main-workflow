@@ -439,8 +439,56 @@ const sendDepartmentProgressReport = async (admin, department, pdfPath) => {
   }
 }
 
-module.exports = {
-  sendTaskReminder,
-  generateDepartmentProgressPDF,
-  sendDepartmentProgressReport,
-}
+// Add this function to the existing emailService.js file
+
+// Send aim reminder email
+const sendAimReminder = async (user) => {
+    try {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: `Reminder: Set Your Today's Aims`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #3b82f6;">Daily Aims Reminder</h2>
+            <p>Hello ${user.name},</p>
+            <p>This is a friendly reminder to set your aims for today. Planning your day helps in better time management and productivity.</p>
+            <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 15px 0;">
+              <h3 style="margin-top: 0; color: #1f2937;">Benefits of Setting Daily Aims:</h3>
+              <ul style="margin-bottom: 0;">
+                <li>Improved focus on important tasks</li>
+                <li>Better time management</li>
+                <li>Increased productivity</li>
+                <li>Clear measurement of daily achievements</li>
+              </ul>
+            </div>
+            <p>Please log in to the WorkflowAI system to set your aims for today.</p>
+            <div style="margin-top: 20px;">
+              <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/aims" 
+                 style="background-color: #3b82f6; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+                Set Today's Aims
+              </a>
+            </div>
+            <p style="margin-top: 20px; color: #6b7280; font-size: 0.9em;">
+              This is an automated message from the WorkflowAI system.
+            </p>
+          </div>
+        `,
+      }
+  
+      const info = await transporter.sendMail(mailOptions)
+      console.log("Aim reminder email sent: ", info.messageId)
+      return info
+    } catch (error) {
+      console.error("Error sending aim reminder email:", error)
+      throw error
+    }
+  }
+  
+  // Export the new function
+  module.exports = {
+    sendTaskReminder,
+    generateDepartmentProgressPDF,
+    sendDepartmentProgressReport,
+    sendAimReminder,
+  }
