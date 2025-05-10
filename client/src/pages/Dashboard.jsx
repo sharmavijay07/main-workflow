@@ -300,7 +300,7 @@ function Dashboard() {
         <AIInsights />
       </div>
 
-      <RecentActivity />
+   
 
       <CreateTaskDialog open={isCreateTaskOpen} onOpenChange={setIsCreateTaskOpen} />
     </div>
