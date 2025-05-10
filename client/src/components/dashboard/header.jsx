@@ -81,7 +81,6 @@
 //   )
 // }
 
-
 "use client"
 
 import { useState } from "react"
@@ -137,7 +136,11 @@ export function DashboardHeader({ sidebarOpen, onSidebarToggle }) {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-background border shadow-xl rounded-xl" align="end" forceMount>
+            <DropdownMenuContent
+              className="w-56 bg-popover/90 backdrop-blur-md border border-border shadow-xl rounded-xl"
+              align="end"
+              forceMount
+            >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
