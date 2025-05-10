@@ -1,8 +1,8 @@
-// "use client";
+// "use client"
 
-// import { useState, useEffect } from "react";
-// import axios from "axios";
-// import { API_URL } from "@/lib/api";
+// import { useState, useEffect } from "react"
+// import axios from "axios"
+// import { api, API_URL } from "@/lib/api"
 // import {
 //   Dialog,
 //   DialogContent,
@@ -10,32 +10,35 @@
 //   DialogFooter,
 //   DialogHeader,
 //   DialogTitle,
-// } from "../ui/dialog";
-// import { Button } from "../ui/button";
-// import { Input } from "../ui/input";
-// import { Label } from "../ui/label";
-// import { Textarea } from "../ui/textarea";
+// } from "../ui/dialog"
+// import { Button } from "../ui/button"
+// import { Input } from "../ui/input"
+// import { Label } from "../ui/label"
+// import { Textarea } from "../ui/textarea"
 // import {
 //   Select,
 //   SelectContent,
 //   SelectItem,
 //   SelectTrigger,
 //   SelectValue,
-// } from "../ui/select";
-// import { Calendar } from "../ui/calendar";
-// import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-// import { CalendarIcon } from "lucide-react";
-// import { format } from "date-fns";
-// import { cn } from "../../lib/utils";
-// import { useToast } from "../../hooks/use-toast";
+// } from "../ui/select"
+// import { Calendar } from "../ui/calendar"
+// import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+// import { CalendarIcon } from "lucide-react"
+// import { format } from "date-fns"
+// import { cn } from "../../lib/utils"
+// import { useToast } from "../../hooks/use-toast"
+// import { useAuth } from "@/context/auth-context"
 
 // export function CreateTaskDialog({ open, onOpenChange }) {
-//   const { toast } = useToast();
-//   const [date, setDate] = useState();
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [departments, setDepartments] = useState([]);
-//   const [users, setUsers] = useState([]);
-//   const [tasks, setTasks] = useState([]);
+//   const { toast } = useToast()
+//   const { user } = useAuth()
+//   const [date, setDate] = useState()
+//   const [isLoading, setIsLoading] = useState(false)
+//   const [departments, setDepartments] = useState([])
+//   const [users, setUsers] = useState([])
+//   const [tasks, setTasks] = useState([])
+//   const [documentFile, setDocumentFile] = useState(null)
 
 //   const [formData, setFormData] = useState({
 //     title: "",
@@ -45,12 +48,11 @@
 //     priority: "Medium",
 //     status: "Pending",
 //     dependencies: [],
-//   });
+//   })
 
-//   // Log formData changes for debugging
 //   useEffect(() => {
-//     console.log("formData updated:", formData);
-//   }, [formData]);
+//     console.log("formData updated:", formData)
+//   }, [formData])
 
 //   // Fetch departments and users when dialog opens
 //   useEffect(() => {
@@ -64,8 +66,9 @@
 //         priority: "Medium",
 //         status: "Pending",
 //         dependencies: [],
-//       });
-//       setDate(undefined);
+//       })
+//       setDate(undefined)
+//       setDocumentFile(null)
 
 //       const fetchData = async () => {
 //         try {
@@ -73,63 +76,129 @@
 //             axios.get(`${API_URL}/departments`),
 //             axios.get(`${API_URL}/users`),
 //             axios.get(`${API_URL}/tasks`),
-//           ]);
+//           ])
 
-//           console.log("Departments:", departmentsResponse.data);
-//           console.log("Users:", usersResponse.data);
-//           console.log("Tasks:", tasksResponse.data);
+//           console.log("Departments:", departmentsResponse.data)
+//           console.log("Users:", usersResponse.data)
+//           console.log("Tasks:", tasksResponse.data)
 
-//           setDepartments(departmentsResponse.data);
-//           setUsers(usersResponse.data);
-//           setTasks(tasksResponse.data);
+//           setDepartments(departmentsResponse.data)
+//           setUsers(usersResponse.data)
+//           setTasks(tasksResponse.data)
 //         } catch (error) {
-//           console.error("Error fetching data:", error);
+//           console.error("Error fetching data:", error)
 //           toast({
 //             title: "Error",
 //             description: "Failed to load required data",
 //             variant: "destructive",
-//           });
+//           })
 //         }
-//       };
+//       }
 
-//       fetchData();
+//       fetchData()
 //     }
-//   }, [open, toast]);
+//   }, [open, toast])
 
 //   const handleChange = (field, value) => {
-//     console.log(`handleChange called - Field: ${field}, Value:`, value);
+//     console.log(`handleChange called - Field: ${field}, Value:`, value)
 //     setFormData((prev) => {
-//       const updatedFormData = { ...prev, [field]: value };
-//       console.log("Updated formData:", updatedFormData);
-//       return updatedFormData;
-//     });
-//   };
+//       const updatedFormData = { ...prev, [field]: value }
+//       console.log("Updated formData:", updatedFormData)
+//       return updatedFormData
+//     })
+//   }
+
+//   const handleFileChange = (e) => {
+//     const file = e.target.files[0]
+//     if (file) {
+//       const validTypes = [
+//         "application/pdf",
+//         "application/msword",
+//         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+//         "text/plain",
+//         "text/html",
+//       ]
+//       const validExtensions = /\.(pdf|doc|docx|txt|html)$/i
+//       const extensionValid = validExtensions.test(file.name)
+//       const typeValid = validTypes.includes(file.type)
+
+//       if (!extensionValid || !typeValid) {
+//         toast({
+//           title: "Invalid File",
+//           description: "Only PDF, DOC, DOCX, TXT, and HTML files are allowed. Ensure the file extension matches its type.",
+//           variant: "destructive",
+//         })
+//         return
+//       }
+
+//       if (file.size > 10 * 1024 * 1024) {
+//         toast({
+//           title: "File Too Large",
+//           description: "File size must be less than 10MB",
+//           variant: "destructive",
+//         })
+//         return
+//       }
+
+//       // Validate file content for HTML
+//       const reader = new FileReader()
+//       reader.onload = (event) => {
+//         const content = event.target.result
+//         if (file.type === "text/html" && typeof content === "string" && !content.startsWith("<!DOCTYPE html")) {
+//           toast({
+//             title: "Invalid HTML File",
+//             description: "The file does not appear to be a valid HTML document.",
+//             variant: "destructive",
+//           })
+//           setDocumentFile(null)
+//         } else {
+//           setDocumentFile(file)
+//         }
+//       }
+//       reader.readAsText(file.slice(0, 100)) // Read first 100 bytes
+//     }
+//   }
 
 //   const handleSubmit = async () => {
 //     if (!formData.title || !formData.department || !formData.assignee) {
-//       console.log("Form Data at submission:", formData);
+//       console.log("Form Data at submission:", formData)
 //       toast({
 //         title: "Validation Error",
 //         description: "Please fill in all required fields (Title, Department, Assignee)",
 //         variant: "destructive",
-//       });
-//       return;
+//       })
+//       return
 //     }
 
-//     setIsLoading(true);
+//     setIsLoading(true)
 
 //     try {
-//       const taskData = {
-//         ...formData,
-//         dueDate: date ? format(date, "yyyy-MM-dd") : null,
-//       };
+//       const formDataToSend = new FormData()
+//       formDataToSend.append("title", formData.title)
+//       formDataToSend.append("description", formData.description)
+//       formDataToSend.append("department", formData.department)
+//       formDataToSend.append("assignee", formData.assignee)
+//       formDataToSend.append("priority", formData.priority)
+//       formDataToSend.append("status", formData.status)
+//       formDataToSend.append("dependencies", JSON.stringify(formData.dependencies))
+//       formDataToSend.append("user", user.id) // Use user._id instead of user
+//       if (date) {
+//         formDataToSend.append("dueDate", format(date, "yyyy-MM-dd"))
+//       }
+//       if (documentFile) {
+//         formDataToSend.append("document", documentFile)
+//       }
 
-//       const result = await axios.post(`${API_URL}/tasks`, taskData);
+//       const result = await axios.post(`${API_URL}/tasks`, formDataToSend, {
+//         headers: {
+//           "Content-Type": "multipart/form-data",
+//         },
+//       })
 
 //       toast({
 //         title: "Success",
 //         description: "Task created successfully",
-//       });
+//       })
 
 //       // Reset form
 //       setFormData({
@@ -140,21 +209,22 @@
 //         priority: "Medium",
 //         status: "Pending",
 //         dependencies: [],
-//       });
-//       setDate(undefined);
+//       })
+//       setDate(undefined)
+//       setDocumentFile(null)
 
-//       onOpenChange(false);
+//       onOpenChange(false)
 //     } catch (error) {
-//       console.error("Error creating task:", error);
+//       console.error("Error creating task:", error)
 //       toast({
 //         title: "Error",
 //         description: error.response?.data?.error || "Failed to create task",
 //         variant: "destructive",
-//       });
+//       })
 //     } finally {
-//       setIsLoading(false);
+//       setIsLoading(false)
 //     }
-//   };
+//   }
 
 //   return (
 //     <Dialog open={open} onOpenChange={onOpenChange} className="dialog-overlay">
@@ -195,8 +265,8 @@
 //               <Select
 //                 value={formData.department}
 //                 onValueChange={(value) => {
-//                   console.log("Department selected:", value);
-//                   handleChange("department", value);
+//                   console.log("Department selected:", value)
+//                   handleChange("department", value)
 //                 }}
 //               >
 //                 <SelectTrigger
@@ -226,8 +296,8 @@
 //               <Select
 //                 value={formData.assignee}
 //                 onValueChange={(value) => {
-//                   console.log("Assignee selected:", value);
-//                   handleChange("assignee", value);
+//                   console.log("Assignee selected:", value)
+//                   handleChange("assignee", value)
 //                 }}
 //               >
 //                 <SelectTrigger
@@ -293,7 +363,10 @@
 //                 <PopoverTrigger asChild>
 //                   <Button
 //                     variant={"outline"}
-//                     className={cn("w-full justify-start text-left font-normal", !date && "text-muted-foreground")}
+//                     className={cn(
+//                       "w-full justify-start text-left font-normal",
+//                       !date && "text-muted-foreground"
+//                     )}
 //                   >
 //                     <CalendarIcon className="mr-2 h-4 w-4" />
 //                     {date ? format(date, "PPP") : "Select date"}
@@ -331,6 +404,19 @@
 //               </SelectContent>
 //             </Select>
 //           </div>
+
+//           <div className="grid gap-2">
+//             <Label htmlFor="document">Document</Label>
+//             <Input
+//               id="document"
+//               type="file"
+//               accept=".pdf,.doc,.docx,.txt,.html"
+//               onChange={handleFileChange}
+//             />
+//             {documentFile && (
+//               <p className="text-sm text-muted-foreground">Selected: {documentFile.name}</p>
+//             )}
+//           </div>
 //         </div>
 //         <DialogFooter>
 //           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -342,13 +428,15 @@
 //         </DialogFooter>
 //       </DialogContent>
 //     </Dialog>
-//   );
+//   )
 // }
+
+
 "use client"
 
-import { useState, useEffect } from "react"
-import axios from "axios"
-import { api, API_URL } from "@/lib/api"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { API_URL } from "@/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -356,35 +444,35 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog"
-import { Button } from "../ui/button"
-import { Input } from "../ui/input"
-import { Label } from "../ui/label"
-import { Textarea } from "../ui/textarea"
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select"
-import { Calendar } from "../ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
-import { CalendarIcon } from "lucide-react"
-import { format } from "date-fns"
-import { cn } from "../../lib/utils"
-import { useToast } from "../../hooks/use-toast"
-import { useAuth } from "@/context/auth-context"
+} from "../ui/select";
+import { Calendar } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "../../lib/utils";
+import { useToast } from "../../hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
 
 export function CreateTaskDialog({ open, onOpenChange }) {
-  const { toast } = useToast()
-  const { user } = useAuth()
-  const [date, setDate] = useState()
-  const [isLoading, setIsLoading] = useState(false)
-  const [departments, setDepartments] = useState([])
-  const [users, setUsers] = useState([])
-  const [tasks, setTasks] = useState([])
-  const [documentFile, setDocumentFile] = useState(null)
+  const { toast } = useToast();
+  const { user } = useAuth();
+  const [date, setDate] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [documentFile, setDocumentFile] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -394,16 +482,15 @@ export function CreateTaskDialog({ open, onOpenChange }) {
     priority: "Medium",
     status: "Pending",
     dependencies: [],
-  })
+  });
 
   useEffect(() => {
-    console.log("formData updated:", formData)
-  }, [formData])
+    console.log("formData updated:", formData);
+  }, [formData]);
 
-  // Fetch departments and users when dialog opens
+  // Fetch departments and tasks
   useEffect(() => {
     if (open) {
-      // Reset formData
       setFormData({
         title: "",
         description: "",
@@ -412,50 +499,83 @@ export function CreateTaskDialog({ open, onOpenChange }) {
         priority: "Medium",
         status: "Pending",
         dependencies: [],
-      })
-      setDate(undefined)
-      setDocumentFile(null)
+      });
+      setDate(undefined);
+      setDocumentFile(null);
 
       const fetchData = async () => {
         try {
-          const [departmentsResponse, usersResponse, tasksResponse] = await Promise.all([
+          const [departmentsResponse, tasksResponse] = await Promise.all([
             axios.get(`${API_URL}/departments`),
-            axios.get(`${API_URL}/users`),
             axios.get(`${API_URL}/tasks`),
-          ])
+          ]);
 
-          console.log("Departments:", departmentsResponse.data)
-          console.log("Users:", usersResponse.data)
-          console.log("Tasks:", tasksResponse.data)
+          console.log("Departments:", departmentsResponse.data);
+          console.log("Tasks:", tasksResponse.data);
 
-          setDepartments(departmentsResponse.data)
-          setUsers(usersResponse.data)
-          setTasks(tasksResponse.data)
+          setDepartments(departmentsResponse.data);
+          setTasks(tasksResponse.data);
+          setUsers([]);
         } catch (error) {
-          console.error("Error fetching data:", error)
+          console.error("Error fetching data:", error);
           toast({
             title: "Error",
             description: "Failed to load required data",
             variant: "destructive",
-          })
+          });
         }
-      }
+      };
 
-      fetchData()
+      fetchData();
     }
-  }, [open, toast])
+  }, [open, toast]);
+
+  // Fetch users when department changes
+  useEffect(() => {
+    const fetchUsersByDepartment = async () => {
+      if (formData.department) {
+        try {
+          const usersResponse = await axios.get(`${API_URL}/users`, {
+            params: {
+              department: formData.department,
+              role_ne: "Admin",
+            },
+          });
+
+          console.log("Users for department:", usersResponse.data);
+          setUsers(usersResponse.data || []);
+          if (formData.assignee && !usersResponse.data.some((u) => u._id === formData.assignee)) {
+            setFormData((prev) => ({ ...prev, assignee: "" }));
+          }
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load users for the selected department",
+            variant: "destructive",
+          });
+          setUsers([]);
+        }
+      } else {
+        setUsers([]);
+        setFormData((prev) => ({ ...prev, assignee: "" }));
+      }
+    };
+
+    fetchUsersByDepartment();
+  }, [formData.department, toast]);
 
   const handleChange = (field, value) => {
-    console.log(`handleChange called - Field: ${field}, Value:`, value)
+    console.log(`handleChange called - Field: ${field}, Value:`, value);
     setFormData((prev) => {
-      const updatedFormData = { ...prev, [field]: value }
-      console.log("Updated formData:", updatedFormData)
-      return updatedFormData
-    })
-  }
+      const updatedFormData = { ...prev, [field]: value };
+      console.log("Updated formData:", updatedFormData);
+      return updatedFormData;
+    });
+  };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]
+    const file = e.target.files[0];
     if (file) {
       const validTypes = [
         "application/pdf",
@@ -463,18 +583,18 @@ export function CreateTaskDialog({ open, onOpenChange }) {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "text/plain",
         "text/html",
-      ]
-      const validExtensions = /\.(pdf|doc|docx|txt|html)$/i
-      const extensionValid = validExtensions.test(file.name)
-      const typeValid = validTypes.includes(file.type)
+      ];
+      const validExtensions = /\.(pdf|doc|docx|txt|html)$/i;
+      const extensionValid = validExtensions.test(file.name);
+      const typeValid = validTypes.includes(file.type);
 
       if (!extensionValid || !typeValid) {
         toast({
           title: "Invalid File",
-          description: "Only PDF, DOC, DOCX, TXT, and HTML files are allowed. Ensure the file extension matches its type.",
+          description: "Only PDF, DOC, DOCX, TXT, and HTML files are allowed.",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
       if (file.size > 10 * 1024 * 1024) {
@@ -482,71 +602,69 @@ export function CreateTaskDialog({ open, onOpenChange }) {
           title: "File Too Large",
           description: "File size must be less than 10MB",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      // Validate file content for HTML
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (event) => {
-        const content = event.target.result
+        const content = event.target.result;
         if (file.type === "text/html" && typeof content === "string" && !content.startsWith("<!DOCTYPE html")) {
           toast({
             title: "Invalid HTML File",
             description: "The file does not appear to be a valid HTML document.",
             variant: "destructive",
-          })
-          setDocumentFile(null)
+          });
+          setDocumentFile(null);
         } else {
-          setDocumentFile(file)
+          setDocumentFile(file);
         }
-      }
-      reader.readAsText(file.slice(0, 100)) // Read first 100 bytes
+      };
+      reader.readAsText(file.slice(0, 100));
     }
-  }
+  };
 
   const handleSubmit = async () => {
     if (!formData.title || !formData.department || !formData.assignee) {
-      console.log("Form Data at submission:", formData)
+      console.log("Form Data at submission:", formData);
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields (Title, Department, Assignee)",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const formDataToSend = new FormData()
-      formDataToSend.append("title", formData.title)
-      formDataToSend.append("description", formData.description)
-      formDataToSend.append("department", formData.department)
-      formDataToSend.append("assignee", formData.assignee)
-      formDataToSend.append("priority", formData.priority)
-      formDataToSend.append("status", formData.status)
-      formDataToSend.append("dependencies", JSON.stringify(formData.dependencies))
-      formDataToSend.append("user", user.id) // Use user._id instead of user
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("department", formData.department);
+      formDataToSend.append("assignee", formData.assignee);
+      formDataToSend.append("priority", formData.priority);
+      formDataToSend.append("status", formData.status);
+      formDataToSend.append("dependencies", JSON.stringify(formData.dependencies));
+      formDataToSend.append("user", user.id);
       if (date) {
-        formDataToSend.append("dueDate", format(date, "yyyy-MM-dd"))
+        formDataToSend.append("dueDate", format(date, "yyyy-MM-dd"));
       }
       if (documentFile) {
-        formDataToSend.append("document", documentFile)
+        formDataToSend.append("document", documentFile);
       }
 
       const result = await axios.post(`${API_URL}/tasks`, formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
+      });
 
       toast({
         title: "Success",
         description: "Task created successfully",
-      })
+      });
 
-      // Reset form
       setFormData({
         title: "",
         description: "",
@@ -555,22 +673,22 @@ export function CreateTaskDialog({ open, onOpenChange }) {
         priority: "Medium",
         status: "Pending",
         dependencies: [],
-      })
-      setDate(undefined)
-      setDocumentFile(null)
+      });
+      setDate(undefined);
+      setDocumentFile(null);
 
-      onOpenChange(false)
+      onOpenChange(false);
     } catch (error) {
-      console.error("Error creating task:", error)
+      console.error("Error creating task:", error);
       toast({
         title: "Error",
         description: error.response?.data?.error || "Failed to create task",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} className="dialog-overlay">
@@ -611,8 +729,8 @@ export function CreateTaskDialog({ open, onOpenChange }) {
               <Select
                 value={formData.department}
                 onValueChange={(value) => {
-                  console.log("Department selected:", value)
-                  handleChange("department", value)
+                  console.log("Department selected:", value);
+                  handleChange("department", value);
                 }}
               >
                 <SelectTrigger
@@ -642,26 +760,31 @@ export function CreateTaskDialog({ open, onOpenChange }) {
               <Select
                 value={formData.assignee}
                 onValueChange={(value) => {
-                  console.log("Assignee selected:", value)
-                  handleChange("assignee", value)
+                  console.log("Assignee selected:", value);
+                  handleChange("assignee", value);
                 }}
+                disabled={users.length === 0}
               >
                 <SelectTrigger
                   id="assignee"
                   className="bg-white border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 >
-                  <SelectValue placeholder="Select assignee" />
+                  <SelectValue placeholder={users.length === 0 ? "No users available" : "Select assignee"} />
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
-                  {users.map((user) => (
-                    <SelectItem
-                      key={user._id}
-                      value={user._id}
-                      className="hover:bg-gray-100 focus:bg-gray-100 transition-colors"
-                    >
-                      {user.name}
-                    </SelectItem>
-                  ))}
+                  {users.length > 0 ? (
+                    users.map((user) => (
+                      <SelectItem
+                        key={user._id}
+                        value={user._id}
+                        className="hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+                      >
+                        {user.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-sm text-gray-500">No users available</div>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -718,8 +841,22 @@ export function CreateTaskDialog({ open, onOpenChange }) {
                     {date ? format(date, "PPP") : "Select date"}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                <PopoverContent
+                  className="w-auto p-0 bg-white border border-gray-300 rounded-md shadow-lg z-[1000]"
+                  align="start"
+                  side="bottom"
+                  avoidCollisions
+                >
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={(newDate) => {
+                      console.log("Calendar date selected:", newDate);
+                      setDate(newDate);
+                    }}
+                    initialFocus
+                    className="bg-white rounded-md"
+                  />
                 </PopoverContent>
               </Popover>
             </div>
@@ -766,7 +903,7 @@ export function CreateTaskDialog({ open, onOpenChange }) {
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Counsel
           </Button>
           <Button type="submit" onClick={handleSubmit} disabled={isLoading}>
             {isLoading ? "Creating..." : "Create Task"}
@@ -774,5 +911,5 @@ export function CreateTaskDialog({ open, onOpenChange }) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
