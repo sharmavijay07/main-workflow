@@ -1,21 +1,158 @@
-/* Add the following to include Tailwind's base, components, and utilities */
 @import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles or @layer directives */
 @layer base {
-  /* your custom base styles */
-  /* Add these to your global CSS or specific modal CSS */
+  :root {
+    /* Global variables unchanged */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+
+    /* Sidebar variables */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark theme unchanged */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+
+    /* Sidebar variables for dark mode */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Scoped styles for Register and Login components */
+  .auth-container {
+    /* Custom variables for Register and Login light theme */
+    --background: 0 0% 98%; /* Soft off-white background */
+    --foreground: 222.2 47.4% 11.2%; /* Dark gray text, avoids black */
+    --card: 0 0% 100%; /* Pure white card */
+    --card-foreground: 222.2 47.4% 11.2%; /* Dark gray card text */
+    --primary: 221.2 83.2% 53.3%; /* Vibrant blue for buttons */
+    --primary-foreground: 210 40% 98%; /* Near-white button text */
+    --secondary: 210 40% 96.1%; /* Light gray for secondary elements */
+    --secondary-foreground: 222.2 47.4% 11.2%; /* Dark gray secondary text */
+    --muted: 210 40% 96.1%; /* Light gray for muted elements */
+    --muted-foreground: 215.4 16.3% 46.9%; /* Medium gray muted text */
+    --accent: 210 40% 96.1%; /* Light gray for accents */
+    --accent-foreground: 222.2 47.4% 11.2%; /* Dark gray accent text */
+    --destructive: 0 84.2% 60.2%; /* Red for errors */
+    --destructive-foreground: 210 40% 98%; /* Near-white destructive text */
+    --border: 214.3 31.8% 91.4%; /* Light gray borders */
+    --input: 214.3 31.8% 91.4%; /* Light gray input borders */
+    --ring: 221.2 83.2% 53.3%; /* Blue focus rings */
+
+    /* Ensure centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 1rem;
+    background-color: hsl(var(--background));
+  }
+
+  /* Apply custom variables to elements within auth-container */
+  .auth-container .bg-gray-50 {
+    background-color: hsl(var(--background));
+  }
+
+  .auth-container .dark:bg-gray-900 {
+    background-color: hsl(var(--background)); /* Override dark mode for light theme */
+  }
+
+  .auth-container .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .auth-container .text-primary {
+    color: hsl(var(--primary));
+  }
+
+  .auth-container .border-red-500 {
+    border-color: hsl(var(--destructive));
+  }
+
+  .auth-container .bg-green-50 {
+    background-color: hsl(120, 40%, 95%); /* Light green for success alert */
+  }
+
+  .auth-container .border-green-200 {
+    border-color: hsl(120, 40%, 85%);
+  }
+
+  .auth-container .bg-white {
+    background-color: hsl(var(--card));
+  }
+
+  .auth-container .text-red-500 {
+    color: hsl(var(--destructive));
+  }
+
+  .auth-container .border-gray-300 {
+    border-color: hsl(var(--border));
+  }
+}
+
+/* Custom styles (unchanged) */
 .dialog-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
-  z-index: 999; /* Ensure the overlay is above other content */
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 
 .dialog-content {
@@ -25,12 +162,9 @@
   padding: 20px;
   width: 100%;
   max-width: 525px;
-  z-index: 1000; /* Make sure it's above the backdrop */
+  z-index: 1000;
 }
 
-}
-
-/* Add this to your global CSS file */
 body.sidebar-open {
   overflow: hidden;
 }
