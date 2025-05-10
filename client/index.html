@@ -1,21 +1,20 @@
+
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>AI WorkFlow</title>
-    <!-- Polyfills for Safari compatibility -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver,Promise,Symbol,Array.prototype.includes"></script>
-    <!-- Theme setup -->
-    <script>
-      const theme = localStorage.getItem('theme') || 'light';
-      document.documentElement.classList.add(theme);
-    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- <script type="module" src="/src/main.jsx"></script> -->
+   
+<script type="module" src="/src/main.jsx">
+  const theme = localStorage.getItem('theme') || 'light';
+  document.documentElement.classList.add(theme);
+</script>
+
   </body>
 </html>
