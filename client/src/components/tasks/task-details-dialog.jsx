@@ -293,7 +293,7 @@ export function TaskDetailsDialog({ task, open, onOpenChange }) {
 
           <Separator />
 
-          <div>
+{/*           <div>
             <h3 className="text-sm font-medium mb-2">Comments</h3>
             <div className="space-y-4">
               <div className="flex gap-3">
@@ -319,7 +319,7 @@ export function TaskDetailsDialog({ task, open, onOpenChange }) {
                 Add Comment
               </Button>
             </div>
-          </div>
+          </div> */}
         </div>
       </DialogContent>
     </Dialog>
