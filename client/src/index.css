@@ -162,7 +162,7 @@
   padding: 20px;
   width: 100%;
   max-width: 525px;
-  z-index: 1000;
+/*   z-index: 1000; */
 }
 
 body.sidebar-open {
