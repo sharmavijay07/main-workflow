@@ -183,10 +183,7 @@ const validateForm = () => {
     newErrors.githubLink = "Please enter a valid GitHub URL"
   }
 
-  if (formData.additionalLinks && !isValidUrl(formData.additionalLinks)) {
-    newErrors.additionalLinks = "Please enter a valid URL"
-  }
-
+ 
   setErrors(newErrors)
   return Object.keys(newErrors).length === 0
 }
