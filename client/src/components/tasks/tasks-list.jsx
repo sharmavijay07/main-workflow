@@ -1,3 +1,4 @@
+
 // "use client"
 
 // import { useState, useEffect } from "react"
@@ -18,6 +19,163 @@
 // import { useToast } from "../../hooks/use-toast"
 // import { api } from "../../lib/api"
 // import { useSocketContext } from "../../context/socket-context"
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogFooter,
+// } from "../ui/dialog"
+// import { Input } from "../ui/input"
+// import { Label } from "../ui/label"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+// import { Textarea } from "../ui/textarea"
+
+// function EditTaskDialog({ task, open, onOpenChange }) {
+//   const { toast } = useToast()
+//   const [formData, setFormData] = useState({
+//     title: "",
+//     description: "",
+//     status: "Pending",
+//     priority: "Medium",
+//     dueDate: "",
+//   })
+//   const [isSubmitting, setIsSubmitting] = useState(false)
+
+//   // Update formData when task prop changes
+//   useEffect(() => {
+//     if (task) {
+//       setFormData({
+//         title: task.title || "",
+//         description: task.description || "",
+//         status: task.status || "Pending",
+//         priority: task.priority || "Medium",
+//         dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split("T")[0] : "",
+//       })
+//     }
+//   }, [task])
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target
+//     setFormData((prev) => ({ ...prev, [name]: value }))
+//   }
+
+//   const handleSelectChange = (name, value) => {
+//     setFormData((prev) => ({ ...prev, [name]: value }))
+//   }
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault()
+//     try {
+//       setIsSubmitting(true)
+//       await api.tasks.updateTask(task._id, {
+//         ...formData,
+//         dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
+//       })
+//       toast({
+//         title: "Success",
+//         description: "Task updated successfully",
+//       })
+//       onOpenChange(false)
+//     } catch (error) {
+//       console.error("Error updating task:", error)
+//       toast({
+//         title: "Error",
+//         description: error.message || "Failed to update task",
+//         variant: "destructive",
+//       })
+//     } finally {
+//       setIsSubmitting(false)
+//     }
+//   }
+
+//   return (
+//     <Dialog open={open} onOpenChange={onOpenChange} className="dialog-overlay">
+//       <DialogContent className="dialog-content sm:max-w-[525px]">
+//         <DialogHeader>
+//           <DialogTitle>Edit Task</DialogTitle>
+//         </DialogHeader>
+//         <form onSubmit={handleSubmit}>
+//           <div className="grid gap-4 py-4">
+//             <div className="grid gap-2">
+//               <Label htmlFor="title">Title</Label>
+//               <Input
+//                 id="title"
+//                 name="title"
+//                 value={formData.title}
+//                 onChange={handleChange}
+//                 required
+//               />
+//             </div>
+//             <div className="grid gap-2">
+//               <Label htmlFor="description">Description</Label>
+//               <Textarea
+//                 id="description"
+//                 name="description"
+//                 value={formData.description}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//             <div className="grid gap-2">
+//               <Label htmlFor="status">Status</Label>
+//               <Select
+//                 value={formData.status}
+//                 onValueChange={(value) => handleSelectChange("status", value)}
+//               >
+//                 <SelectTrigger className="bg-white border border-gray-300 rounded-md shadow-sm">
+//                   <SelectValue />
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                   <SelectItem value="Pending">Pending</SelectItem>
+//                   <SelectItem value="In Progress">In Progress</SelectItem>
+//                   <SelectItem value="Completed">Completed</SelectItem>
+//                 </SelectContent>
+//               </Select>
+//             </div>
+//             <div className="grid gap-2">
+//               <Label htmlFor="priority">Priority</Label>
+//               <Select
+//                 value={formData.priority}
+//                 onValueChange={(value) => handleSelectChange("priority", value)}
+//               >
+//                 <SelectTrigger className="bg-white border border-gray-300 rounded-md shadow-sm">
+//                   <SelectValue />
+//                 </SelectTrigger>
+//                 <SelectContent>
+//                   <SelectItem value="Low">Low</SelectItem>
+//                   <SelectItem value="Medium">Medium</SelectItem>
+//                   <SelectItem value="High">High</SelectItem>
+//                 </SelectContent>
+//               </Select>
+//             </div>
+//             <div className="grid gap-2">
+//               <Label htmlFor="dueDate">Due Date</Label>
+//               <Input
+//                 id="dueDate"
+//                 name="dueDate"
+//                 type="date"
+//                 value={formData.dueDate}
+//                 onChange={handleChange}
+//               />
+//             </div>
+//           </div>
+//           <DialogFooter>
+//             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+//               Cancel
+//             </Button>
+//             <Button type="submit" disabled={isSubmitting}>
+//               {isSubmitting ? (
+//                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+//               ) : (
+//                 "Save Changes"
+//               )}
+//             </Button>
+//           </DialogFooter>
+//         </form>
+//       </DialogContent>
+//     </Dialog>
+//   )
+// }
 
 // export function TasksList({ filters }) {
 //   const { toast } = useToast()
@@ -27,6 +185,7 @@
 //   const [error, setError] = useState(null)
 //   const [selectedTask, setSelectedTask] = useState(null)
 //   const [isDetailsOpen, setIsDetailsOpen] = useState(false)
+//   const [isEditOpen, setIsEditOpen] = useState(false)
 //   const [isDeleting, setIsDeleting] = useState(false)
 
 //   // Fetch tasks based on filters
@@ -42,7 +201,7 @@
 //         toast({
 //           title: "Error",
 //           description: err.message || "Failed to load tasks",
-//           variant: "destructive"
+//           variant: "destructive",
 //         })
 //       } finally {
 //         setIsLoading(false)
@@ -67,16 +226,16 @@
 //         )
 //       }
 
-//       if (latestEvent.type === 'task-created' && matchesFilters(latestEvent.data)) {
-//         setTasks(prev => [...prev, latestEvent.data])
-//       } 
-//       else if (latestEvent.type === 'task-updated') {
-//         setTasks(prev => prev.map(task => 
-//           task.id === latestEvent.data.id ? latestEvent.data : task
-//         ).filter(matchesFilters))
-//       }
-//       else if (latestEvent.type === 'task-deleted') {
-//         setTasks(prev => prev.filter(task => task.id !== latestEvent.data.id))
+//       if (latestEvent.type === "task-created" && matchesFilters(latestEvent.data)) {
+//         setTasks((prev) => [...prev, latestEvent.data])
+//       } else if (latestEvent.type === "task-updated") {
+//         setTasks((prev) =>
+//           prev
+//             .map((task) => (task._id === latestEvent.data._id ? latestEvent.data : task))
+//             .filter(matchesFilters)
+//         )
+//       } else if (latestEvent.type === "task-deleted") {
+//         setTasks((prev) => prev.filter((task) => task._id !== latestEvent.data._id))
 //       }
 //     }
 //   }, [events, filters])
@@ -112,22 +271,26 @@
 //     setIsDetailsOpen(true)
 //   }
 
+//   const handleEditTask = (task) => {
+//     setSelectedTask(task)
+//     setIsEditOpen(true)
+//   }
+
 //   const handleDeleteTask = async (taskId) => {
 //     if (confirm("Are you sure you want to delete this task?")) {
 //       try {
 //         setIsDeleting(true)
 //         await api.tasks.deleteTask(taskId)
-//         setTasks(tasks.filter(task => task.id !== taskId))
 //         toast({
 //           title: "Success",
-//           description: "Task deleted successfully"
+//           description: "Task deleted successfully",
 //         })
 //       } catch (error) {
 //         console.error("Error deleting task:", error)
 //         toast({
 //           title: "Error",
 //           description: error.message || "Failed to delete task",
-//           variant: "destructive"
+//           variant: "destructive",
 //         })
 //       } finally {
 //         setIsDeleting(false)
@@ -137,7 +300,7 @@
 
 //   // Group tasks by department
 //   const groupedTasks = tasks.reduce((acc, task) => {
-//     const deptName = task.department?.name || 'Unknown'
+//     const deptName = task.department?.name || "Unknown"
 //     if (!acc[deptName]) {
 //       acc[deptName] = []
 //     }
@@ -172,8 +335,8 @@
 //         <CardContent>
 //           <div className="p-4 text-center text-red-500">
 //             <p>Error loading tasks: {error}</p>
-//             <Button 
-//               variant="outline" 
+//             <Button
+//               variant="outline"
 //               className="mt-4"
 //               onClick={() => window.location.reload()}
 //             >
@@ -215,16 +378,18 @@
 //                   </TableHeader>
 //                   <TableBody>
 //                     {deptTasks.map((task) => (
-//                       <TableRow key={task._id ?? task.title}>
+//                       <TableRow key={task._id}>
 //                         <TableCell>{task.title}</TableCell>
-//                         <TableCell>{task.assignee?.name || 'Unassigned'}</TableCell>
+//                         <TableCell>{task.assignee?.name || "Unassigned"}</TableCell>
 //                         <TableCell>
 //                           <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
 //                         </TableCell>
 //                         <TableCell>
 //                           <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
 //                         </TableCell>
-//                         <TableCell>{task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}</TableCell>
+//                         <TableCell>
+//                           {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : "No date"}
+//                         </TableCell>
 //                         <TableCell className="text-right">
 //                           <DropdownMenu>
 //                             <DropdownMenuTrigger asChild>
@@ -233,28 +398,31 @@
 //                                 <MoreHorizontal className="h-4 w-4" />
 //                               </Button>
 //                             </DropdownMenuTrigger>
-//                             <DropdownMenuContent 
-//                               align="end" 
+//                             <DropdownMenuContent
+//                               align="end"
 //                               className="bg-white border border-gray-200 shadow-lg rounded-md"
 //                             >
-//                               <DropdownMenuLabel className="font-medium text-gray-900">Actions</DropdownMenuLabel>
-//                               <DropdownMenuItem 
+//                               <DropdownMenuLabel className="font-medium text-gray-900">
+//                                 Actions
+//                               </DropdownMenuLabel>
+//                               <DropdownMenuItem
 //                                 onClick={() => handleViewTask(task)}
 //                                 className="text-gray-700 hover:bg-gray-100 hover:text-gray-900"
 //                               >
 //                                 <Eye className="mr-2 h-4 w-4" />
 //                                 View details
 //                               </DropdownMenuItem>
-//                               <DropdownMenuItem 
+//                               <DropdownMenuItem
+//                                 onClick={() => handleEditTask(task)}
 //                                 className="text-gray-700 hover:bg-gray-100 hover:text-gray-900"
 //                               >
 //                                 <Edit className="mr-2 h-4 w-4" />
 //                                 Edit task
 //                               </DropdownMenuItem>
 //                               <DropdownMenuSeparator className="bg-gray-200" />
-//                               <DropdownMenuItem 
+//                               <DropdownMenuItem
 //                                 className="text-red-600 hover:bg-red-50 hover:text-red-700"
-//                                 onClick={() => handleDeleteTask(task.id)}
+//                                 onClick={() => handleDeleteTask(task._id)}
 //                                 disabled={isDeleting}
 //                               >
 //                                 <Trash className="mr-2 h-4 w-4" />
@@ -272,11 +440,23 @@
 //           </Card>
 //         ))
 //       )}
-//       {selectedTask && <TaskDetailsDialog task={selectedTask} open={isDetailsOpen} onOpenChange={setIsDetailsOpen} />}
+//       {selectedTask && (
+//         <>
+//           <TaskDetailsDialog
+//             task={selectedTask}
+//             open={isDetailsOpen}
+//             onOpenChange={setIsDetailsOpen}
+//           />
+//           <EditTaskDialog
+//             task={selectedTask}
+//             open={isEditOpen}
+//             onOpenChange={setIsEditOpen}
+//           />
+//         </>
+//       )}
 //     </div>
 //   )
 // }
-
 
 "use client"
 
@@ -309,9 +489,11 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Textarea } from "../ui/textarea"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function EditTaskDialog({ task, open, onOpenChange }) {
-  const { toast } = useToast()
+  // const { toast } = useToast()
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -344,27 +526,20 @@ function EditTaskDialog({ task, open, onOpenChange }) {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
       await api.tasks.updateTask(task._id, {
         ...formData,
         dueDate: formData.dueDate ? new Date(formData.dueDate).toISOString() : null,
-      })
-      toast({
-        title: "Success",
-        description: "Task updated successfully",
-      })
-      onOpenChange(false)
+      });
+      toast.success("Task updated successfully");
+      onOpenChange(false);
     } catch (error) {
-      console.error("Error updating task:", error)
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update task",
-        variant: "destructive",
-      })
+      console.error("Error updating task:", error);
+      toast.error(error.message || "Failed to update task");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -558,21 +733,14 @@ export function TasksList({ filters }) {
   const handleDeleteTask = async (taskId) => {
     if (confirm("Are you sure you want to delete this task?")) {
       try {
-        setIsDeleting(true)
-        await api.tasks.deleteTask(taskId)
-        toast({
-          title: "Success",
-          description: "Task deleted successfully",
-        })
+        setIsDeleting(true);
+        await api.tasks.deleteTask(taskId);
+        toast.success("Task deleted successfully");
       } catch (error) {
-        console.error("Error deleting task:", error)
-        toast({
-          title: "Error",
-          description: error.message || "Failed to delete task",
-          variant: "destructive",
-        })
+        console.error("Error deleting task:", error);
+        toast.error(error.message || "Failed to delete task");
       } finally {
-        setIsDeleting(false)
+        setIsDeleting(false);
       }
     }
   }
@@ -737,6 +905,7 @@ export function TasksList({ filters }) {
   )
 }
 
+<ToastContainer />
 
 
 
