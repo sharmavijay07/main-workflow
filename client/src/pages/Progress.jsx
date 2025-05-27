@@ -561,12 +561,12 @@ function Progress() {
                     Due: {format(new Date(selectedTask.dueDate), "PPP")}
                   </span>
                 </div>
-                <Slider
+               <Slider
                   value={[progressValue]}
                   onValueChange={(values) => setProgressValue(values[0])}
                   max={100}
                   step={1}
-                  className="py-4"
+                  className="py-4 [&>span:first-child]:bg-black [&>span:last-child]:bg-white [&>span:first-child]:border-black [&>span:last-child]:border-white-400"
                 />
               </div>
 
