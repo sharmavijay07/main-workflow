@@ -1,3 +1,5 @@
+
+
 // const express = require("express");
 // const mongoose = require("mongoose");
 // const cors = require("cors");
@@ -5,8 +7,7 @@
 // const socketIo = require("socket.io");
 // const jwt = require("jsonwebtoken");
 // const path = require("path");
-
-// // Import routes
+// const userNotificationRoutes = require('./routes/user-notifications');
 // const taskRoutes = require("./routes/tasks");
 // const departmentRoutes = require("./routes/departments");
 // const userRoutes = require("./routes/users");
@@ -104,6 +105,7 @@
 // app.use('/api/progress', progressRoutes); // Add this line
 // app.use('/api/notifications', notificationRoutes); // Add this line
 // app.use('/api/aims', aimRoutes);
+// app.use('/api/user-notifications', userNotificationRoutes);
 
 // // app.use('/api/new/ai',aiRoutePy)
 
@@ -142,6 +144,7 @@ const aiNewRoutes = require('./routes/aiRoutes');
 const progressRoutes = require('./routes/progress'); // Add this line
 const notificationRoutes = require('./routes/notifications'); // Add this line
 const aimRoutes = require('./routes/aim');
+const pushRoutes = require('./routes/push'); // Add this line
 // const aiRoutePy = require('./routes/aiRoutePy')
 // Create Express app
 const app = express();
@@ -228,6 +231,7 @@ app.use('/api/progress', progressRoutes); // Add this line
 app.use('/api/notifications', notificationRoutes); // Add this line
 app.use('/api/aims', aimRoutes);
 app.use('/api/user-notifications', userNotificationRoutes);
+app.use("/api/push", pushRoutes) // Added push routes use
 
 // app.use('/api/new/ai',aiRoutePy)
 
@@ -244,4 +248,3 @@ const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
