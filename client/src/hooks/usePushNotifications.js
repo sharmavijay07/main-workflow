@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { initializePushNotifications, unsubscribeFromPushNotifications } from "../utlils/pushNotifications"
+import { initializePushNotifications, unsubscribeFromPushNotifications } from "../utils/pushNotifications"
 import { useAuth } from "../context/auth-context"
 
 export function usePushNotifications() {
