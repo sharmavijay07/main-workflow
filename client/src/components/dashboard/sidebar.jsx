@@ -14,6 +14,7 @@ export function DashboardSidebar() {
     { title: "AI Optimization", href: "/optimization", icon: Sparkles },
      { title: "All Aims", href: "/all-aims", icon: Target },
     { title: "Completed Tasks", href: "/completedtask", icon: CheckCircle },
+     { title: "Leaderboard", href: "/leaderboard", icon: Sparkles },
   ];
 
   // Only show these routes if the user is an admin
@@ -21,6 +22,7 @@ export function DashboardSidebar() {
     { title: "Dashboard", href: "/userdashboard", icon: LayoutDashboardIcon },
     { title: "Progress", href: "/progress", icon: BarChart },
     { title: "Set Aims", href: "/aims", icon: Airplay },
+     { title: "Leaderboard", href: "/leaderboard", icon: Sparkles },
   ];
 
   const renderRoutes = user?.role === "User" ? userRoutes : routes;
