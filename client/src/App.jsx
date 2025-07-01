@@ -25,7 +25,7 @@ import Progress from "./pages/Progress";
 import TodaysAim from "./pages/TodaysAim";
 import AllAims from "./pages/AllAims";
 import { DashboardProvider } from "./context/DashboardContext";
-import Leaderboard from "./pages/LeaderBoard"; // Add this import
+import Leaderboard from "./pages/Leaderboard"; // Add this import
 import axios from "axios";
 import { API_URL } from "./lib/api";
 import { ToastContainer } from "react-toastify";
