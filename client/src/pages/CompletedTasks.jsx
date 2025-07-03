@@ -1,10 +1,11 @@
+
 // "use client"
 
 // import { useState, useEffect } from "react"
 // import axios from "axios"
 // import { useNavigate } from "react-router-dom"
 // import { useToast } from "../hooks/use-toast"
-// import { Check, Clock, Filter, Github, Link2, Loader2, ThumbsDown, ThumbsUp, Search, AlertTriangle, ExternalLink, CheckCircle, XCircle, HelpCircle } from 'lucide-react'
+// import { Check, Clock, Filter, Github, Link2, Loader2, ThumbsDown, ThumbsUp, Search, AlertTriangle, ExternalLink, CheckCircle, XCircle, HelpCircle, FileText } from 'lucide-react'
 // import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card"
 // import { Input } from "../components/ui/input"
 // import { Button } from "../components/ui/button"
@@ -56,80 +57,66 @@
 
 //   const fetchData = async () => {
 //     try {
-//       setIsLoading(true);
-//       const token = localStorage.getItem("authToken"); // Assuming the token is stored in localStorage
-  
-//       // Fetch completed tasks
+//       setIsLoading(true)
+//       const token = localStorage.getItem("WorkflowToken")
+
 //       const tasksResponse = await axios.get(`${API_URL}/tasks?status=Completed`, {
-//         headers: {
-//           "x-auth-token": token, // Send token in the headers
-//         },
-//       });
-//       setTasks(tasksResponse.data);
-  
-//       // Fetch all submissions
+//         headers: { "x-auth-token": token },
+//       })
+//       setTasks(tasksResponse.data)
+
 //       const submissionsResponse = await axios.get(`${API_URL}/submissions`, {
-//         headers: {
-//           "x-auth-token": token, // Send token in the headers
-//         },
-//       });
-//       setSubmissions(submissionsResponse.data);
-  
-//       // Fetch departments for filtering
+//         headers: { "x-auth-token": token },
+//       })
+//       setSubmissions(submissionsResponse.data)
+
 //       const departmentsResponse = await axios.get(`${API_URL}/departments`, {
-//         headers: {
-//           "x-auth-token": token, // Send token in the headers
-//         },
-//       });
-//       setDepartments(departmentsResponse.data);
+//         headers: { "x-auth-token": token },
+//       })
+//       setDepartments(departmentsResponse.data)
 //     } catch (error) {
-//       console.error("Error fetching data:", error);
+//       console.error("Error fetching data:", error)
 //       toast({
 //         title: "Error",
-//         description: "Failed to load completed tasks",
+//         description: "Failed to load data",
 //         variant: "destructive",
-//       });
+//       })
 //     } finally {
-//       setIsLoading(false);
+//       setIsLoading(false)
 //     }
-//   };
-  
+//   }
+
 //   const handleReviewSubmission = async () => {
-//     if (!selectedSubmission) return;
-  
+//     if (!selectedSubmission) return
+
 //     try {
-//       setIsLoading(true);
-//       const token = localStorage.getItem("WorkflowToken"); // Assuming the token is stored in localStorage
-  
+//       setIsLoading(true)
+//       const token = localStorage.getItem("WorkflowToken")
+
 //       await axios.put(
 //         `${API_URL}/submissions/${selectedSubmission._id}/review`,
 //         reviewData,
-//         {
-//           headers: {
-//             "x-auth-token": token, // Send token in the headers
-//           },
-//         }
-//       );
-  
+//         { headers: { "x-auth-token": token } }
+//       )
+
 //       toast({
 //         title: "Success",
 //         description: `Submission ${reviewData.status.toLowerCase()} successfully`,
-//       });
-  
-//       setReviewDialogOpen(false);
-//       fetchData(); // Refresh data
+//       })
+
+//       setReviewDialogOpen(false)
+//       fetchData()
 //     } catch (error) {
-//       console.error("Error reviewing submission:", error);
+//       console.error("Error reviewing submission:", error)
 //       toast({
 //         title: "Error",
 //         description: "Failed to review submission",
 //         variant: "destructive",
-//       });
+//       })
 //     } finally {
-//       setIsLoading(false);
+//       setIsLoading(false)
 //     }
-//   };
-  
+//   }
 
 //   const getSubmissionForTask = (taskId) => {
 //     return submissions.find((submission) => submission.task?._id === taskId)
@@ -158,18 +145,33 @@
 //     }
 //   }
 
+//   const getDocumentDetails = (documentLink, fileType) => {
+//     if (!documentLink) return { url: null, fileName: null, fileType: null }
+//     const fileName = documentLink.split("/").pop() || "Document"
+//     const url = documentLink
+//     const fileTypeMap = {
+//       "application/pdf": "PDF Document",
+//       "application/msword": "Word Document",
+//       "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word Document",
+//       "image/png": "PNG Image",
+//       "image/jpeg": "JPEG Image",
+//     }
+//     const displayFileType = fileTypeMap[fileType] || "Document"
+//     const isPDF = fileType === "application/pdf"
+//     const isImage = fileType.startsWith("image/")
+//     const displayUrl = isPDF ? `${url}?_a=BAE6pY0` : url
+//     return { url: displayUrl, fileName, fileType: displayFileType, isImage }
+//   }
+
 //   const filteredTasks = tasks
 //     .filter((task) => {
-//       // Filter by search term
 //       const matchesSearch =
 //         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
 //         task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
 //         (task.assignee?.name && task.assignee.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-//       // Filter by department
 //       const matchesDepartment = selectedDepartment === "all" || task.department?._id === selectedDepartment
 
-//       // Filter by submission status
 //       const submission = getSubmissionForTask(task._id)
 //       let matchesSubmission = true
 //       if (submissionFilter === "pending") {
@@ -295,8 +297,7 @@
 //                 </div>
 //                 <h3 className="text-xl font-semibold mb-1">No completed tasks found</h3>
 //                 <p className="text-muted-foreground text-center max-w-md">
-//                   There are no completed tasks matching your current filters. Try changing your search criteria or check
-//                   back later.
+//                   There are no completed tasks matching your current filters. Try changing your search criteria or check back later.
 //                 </p>
 //               </CardContent>
 //             </Card>
@@ -304,6 +305,7 @@
 //             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 //               {filteredTasks.map((task) => {
 //                 const submission = getSubmissionForTask(task._id)
+//                 const document = submission ? getDocumentDetails(submission.documentLink, submission.fileType) : null
 //                 return (
 //                   <Card
 //                     key={task._id}
@@ -332,18 +334,20 @@
 //                             {getSubmissionStatusBadge(submission.status)}
 //                           </div>
 //                           <div className="bg-muted/50 rounded-lg p-3 space-y-2">
-//                             <div className="flex items-center gap-2 text-sm">
-//                               <Github className="h-4 w-4 text-muted-foreground" />
-//                               <a
-//                                 href={submission.githubLink}
-//                                 target="_blank"
-//                                 rel="noopener noreferrer"
-//                                 className="text-blue-600 dark:text-blue-400 hover:underline truncate flex items-center gap-1"
-//                               >
-//                                 {submission.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-//                                 <ExternalLink className="h-3 w-3" />
-//                               </a>
-//                             </div>
+//                             {submission.githubLink && (
+//                               <div className="flex items-center gap-2 text-sm">
+//                                 <Github className="h-4 w-4 text-muted-foreground" />
+//                                 <a
+//                                   href={submission.githubLink}
+//                                   target="_blank"
+//                                   rel="noopener noreferrer"
+//                                   className="text-blue-600 dark:text-blue-400 hover:underline truncate flex items-center gap-1"
+//                                 >
+//                                   {submission.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+//                                   <ExternalLink className="h-3 w-3" />
+//                                 </a>
+//                               </div>
+//                             )}
 //                             {submission.additionalLinks && (
 //                               <div className="flex items-center gap-2 text-sm">
 //                                 <Link2 className="h-4 w-4 text-muted-foreground" />
@@ -354,6 +358,20 @@
 //                                   className="text-blue-600 dark:text-blue-400 hover:underline truncate flex items-center gap-1"
 //                                 >
 //                                   {new URL(submission.additionalLinks).hostname}
+//                                   <ExternalLink className="h-3 w-3" />
+//                                 </a>
+//                               </div>
+//                             )}
+//                             {document?.url && (
+//                               <div className="flex items-center gap-2 text-sm">
+//                                 <FileText className="h-4 w-4 text-muted-foreground" />
+//                                 <a
+//                                   href={document.url}
+//                                   target={document.isImage ? "_self" : "_blank"}
+//                                   rel="noopener noreferrer"
+//                                   className="text-blue-600 dark:text-blue-400 hover:underline truncate flex items-center gap-1"
+//                                 >
+//                                   {document.fileName} ({document.fileType})
 //                                   <ExternalLink className="h-3 w-3" />
 //                                 </a>
 //                               </div>
@@ -431,6 +449,7 @@
 //                     <tbody>
 //                       {filteredTasks.map((task) => {
 //                         const submission = getSubmissionForTask(task._id)
+//                         const document = submission ? getDocumentDetails(submission.documentLink, submission.fileType) : null
 //                         return (
 //                           <tr key={task._id} className="border-b hover:bg-muted/50">
 //                             <td className="p-4">
@@ -469,17 +488,35 @@
 //                             </td>
 //                             <td className="p-4">
 //                               {submission ? (
-//                                 <div className="flex items-center gap-2">
-//                                   <Github className="h-4 w-4" />
-//                                   <a
-//                                     href={submission.githubLink}
-//                                     target="_blank"
-//                                     rel="noopener noreferrer"
-//                                     className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[200px] flex items-center gap-1"
-//                                   >
-//                                     {submission.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-//                                     <ExternalLink className="h-3 w-3" />
-//                                   </a>
+//                                 <div className="space-y-2">
+//                                   {submission.githubLink && (
+//                                     <div className="flex items-center gap-2">
+//                                       <Github className="h-4 w-4" />
+//                                       <a
+//                                         href={submission.githubLink}
+//                                         target="_blank"
+//                                         rel="noopener noreferrer"
+//                                         className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[200px] flex items-center gap-1"
+//                                       >
+//                                         {submission.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+//                                         <ExternalLink className="h-3 w-3" />
+//                                       </a>
+//                                     </div>
+//                                   )}
+//                                   {document?.url && (
+//                                     <div className="flex items-center gap-2">
+//                                       <FileText className="h-4 w-4" />
+//                                       <a
+//                                         href={document.url}
+//                                         target={document.isImage ? "_self" : "_blank"}
+//                                         rel="noopener noreferrer"
+//                                         className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[200px] flex items-center gap-1"
+//                                       >
+//                                         {document.fileName} ({document.fileType})
+//                                         <ExternalLink className="h-3 w-3" />
+//                                       </a>
+//                                     </div>
+//                                   )}
 //                                 </div>
 //                               ) : (
 //                                 <span className="text-muted-foreground">No submission</span>
@@ -536,7 +573,7 @@
 //                     <tr className="border-b">
 //                       <th className="text-left p-4 font-medium">Task</th>
 //                       <th className="text-left p-4 font-medium">Submitted By</th>
-//                       <th className="text-left p-4 font-medium">GitHub Link</th>
+//                       <th className="text-left p-4 font-medium">Submission Details</th>
 //                       <th className="text-left p-4 font-medium">Submitted On</th>
 //                       <th className="text-left p-4 font-medium">Status</th>
 //                       <th className="text-right p-4 font-medium">Actions</th>
@@ -545,15 +582,12 @@
 //                   <tbody>
 //                     {submissions
 //                       .filter((submission) => {
-//                         // Filter by department if selected
 //                         if (selectedDepartment !== "all") {
 //                           const task = tasks.find((t) => t._id === submission.task?._id)
 //                           if (!task || task.department?._id !== selectedDepartment) {
 //                             return false
 //                           }
 //                         }
-
-//                         // Filter by submission status
 //                         if (submissionFilter !== "all") {
 //                           if (submissionFilter === "pending" && submission.status !== "Pending") {
 //                             return false
@@ -563,12 +597,12 @@
 //                             return false
 //                           }
 //                         }
-
 //                         return true
 //                       })
 //                       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 //                       .map((submission) => {
 //                         const task = tasks.find((t) => t._id === submission.task?._id)
+//                         const document = getDocumentDetails(submission.documentLink, submission.fileType)
 //                         return (
 //                           <tr key={submission._id} className="border-b hover:bg-muted/50">
 //                             <td className="p-4">
@@ -597,17 +631,41 @@
 //                               )}
 //                             </td>
 //                             <td className="p-4">
-//                               <div className="flex items-center gap-2">
-//                                 <Github className="h-4 w-4" />
-//                                 <a
-//                                   href={submission.githubLink}
-//                                   target="_blank"
-//                                   rel="noopener noreferrer"
-//                                   className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[200px] flex items-center gap-1"
-//                                 >
-//                                   {submission.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-//                                   <ExternalLink className="h-3 w-3" />
-//                                 </a>
+//                               <div className="space-y-2">
+//                                 {submission.githubLink && (
+//                                   <div className="flex items-center gap-2">
+//                                     <Github className="h-4 w-4" />
+//                                     <a
+//                                       href={submission.githubLink}
+//                                       target="_blank"
+//                                       rel="noopener noreferrer"
+//                                       className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[200px] flex items-center gap-1"
+//                                     >
+//                                       {submission.githubLink.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+//                                       <ExternalLink className="h-3 w-3" />
+//                                     </a>
+//                                   </div>
+//                                 )}
+//                                 {document?.url && (
+//                                   <div className="flex items-center gap-2">
+//                                     <FileText className="h-4 w-4" />
+//                                     <a
+//                                       href={document.url}
+//                                       target={document.isImage ? "_self" : "_blank"}
+//                                       rel="noopener noreferrer"
+//                                       className="text-blue-600 dark:text-blue-400 hover:underline truncate max-w-[200px] flex items-center gap-1"
+//                                     >
+//                                       {document.fileName} ({document.fileType})
+//                                       <ExternalLink className="h-3 w-3" />
+//                                     </a>
+//                                   </div>
+//                                 )}
+//                                 {submission.notes && (
+//                                   <div className="pt-1 text-sm">
+//                                     <p className="text-xs font-medium text-muted-foreground">Notes:</p>
+//                                     <p className="line-clamp-2">{submission.notes}</p>
+//                                   </div>
+//                                 )}
 //                               </div>
 //                             </td>
 //                             <td className="p-4">
@@ -653,139 +711,143 @@
 //         </TabsContent>
 //       </Tabs>
 
-//       {/* Review Submission Dialog */}
-//        <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen} className="dialog-overlay">
-//   <DialogContent
-//     className="dialog-content sm:max-w-[525px] max-w-full sm:max-w-[525px] w-[90vw] max-h-[90vh] overflow-y-auto"
-//   >
-//     <DialogHeader>
-//       <DialogTitle>Review Task Submission</DialogTitle>
-//       <DialogDescription>
-//         Review and provide feedback on this task submission.
-//       </DialogDescription>
-//     </DialogHeader>
+//       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen} className="dialog-overlay">
+//         <DialogContent className="dialog-content sm:max-w-[525px] max-w-full sm:max-w-[525px] w-[90vw] max-h-[90vh] overflow-y-auto">
+//           <DialogHeader>
+//             <DialogTitle>Review Task Submission</DialogTitle>
+//             <DialogDescription>Review and provide feedback on this task submission.</DialogDescription>
+//           </DialogHeader>
 
-//     {selectedSubmission && (
-//       <div className="space-y-6 py-4">
-//         <div className="space-y-4">
-//           {/* Task Info */}
-//           <div>
-//             <h3 className="text-sm font-medium mb-2">Task Information</h3>
-//             <div className="bg-muted p-3 rounded-lg">
-//               <h4 className="font-medium">{selectedSubmission.task?.title}</h4>
-//               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-//                 {selectedSubmission.task?.description}
-//               </p>
-//             </div>
-//           </div>
-
-//           {/* Submission Details */}
-//           <div>
-//             <h3 className="text-sm font-medium mb-2">Submission Details</h3>
-//             <div className="space-y-3">
-//               <div className="flex flex-wrap items-center gap-2 break-all">
-//                 <Github className="h-4 w-4" />
-//                 <a
-//                   href={selectedSubmission.githubLink}
-//                   target="_blank"
-//                   rel="noopener noreferrer"
-//                   className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-//                 >
-//                   {selectedSubmission.githubLink}
-//                   <ExternalLink className="h-3 w-3" />
-//                 </a>
-//               </div>
-
-//               {selectedSubmission.additionalLinks && (
-//                 <div className="flex flex-wrap items-center gap-2 break-all">
-//                   <Link2 className="h-4 w-4" />
-//                   <a
-//                     href={selectedSubmission.additionalLinks}
-//                     target="_blank"
-//                     rel="noopener noreferrer"
-//                     className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-//                   >
-//                     {selectedSubmission.additionalLinks}
-//                   </a>
+//           {selectedSubmission && (
+//             <div className="space-y-6 py-4">
+//               <div className="space-y-4">
+//                 <div>
+//                   <h3 className="text-sm font-medium mb-2">Task Information</h3>
+//                   <div className="bg-muted p-3 rounded-lg">
+//                     <h4 className="font-medium">{selectedSubmission.task?.title}</h4>
+//                     <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+//                       {selectedSubmission.task?.description}
+//                     </p>
+//                   </div>
 //                 </div>
-//               )}
 
-//               {selectedSubmission.notes && (
-//                 <div className="bg-muted p-3 rounded-lg mt-2">
-//                   <h4 className="text-sm font-medium mb-1">Notes from Submitter:</h4>
-//                   <p className="text-sm whitespace-pre-line">{selectedSubmission.notes}</p>
+//                 <div>
+//                   <h3 className="text-sm font-medium mb-2">Submission Details</h3>
+//                   <div className="space-y-3">
+//                     {selectedSubmission.githubLink && (
+//                       <div className="flex flex-wrap items-center gap-2 break-all">
+//                         <Github className="h-4 w-4" />
+//                         <a
+//                           href={selectedSubmission.githubLink}
+//                           target="_blank"
+//                           rel="noopener noreferrer"
+//                           className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+//                         >
+//                           {selectedSubmission.githubLink}
+//                           <ExternalLink className="h-3 w-3" />
+//                         </a>
+//                       </div>
+//                     )}
+//                     {selectedSubmission.additionalLinks && (
+//                       <div className="flex flex-wrap items-center gap-2 break-all">
+//                         <Link2 className="h-4 w-4" />
+//                         <a
+//                           href={selectedSubmission.additionalLinks}
+//                           target="_blank"
+//                           rel="noopener noreferrer"
+//                           className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+//                         >
+//                           {selectedSubmission.additionalLinks}
+//                           <ExternalLink className="h-3 w-3" />
+//                         </a>
+//                       </div>
+//                     )}
+//                     {selectedSubmission.documentLink && (
+//                       <div className="flex flex-wrap items-center gap-2 break-all">
+//                         <FileText className="h-4 w-4" />
+//                         <a
+//                           href={getDocumentDetails(selectedSubmission.documentLink, selectedSubmission.fileType).url}
+//                           target={getDocumentDetails(selectedSubmission.documentLink, selectedSubmission.fileType).isImage ? "_self" : "_blank"}
+//                           rel="noopener noreferrer"
+//                           className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+//                         >
+//                           {getDocumentDetails(selectedSubmission.documentLink, selectedSubmission.fileType).fileName} ({getDocumentDetails(selectedSubmission.documentLink, selectedSubmission.fileType).fileType})
+//                           <ExternalLink className="h-3 w-3" />
+//                         </a>
+//                       </div>
+//                     )}
+//                     {selectedSubmission.notes && (
+//                       <div className="bg-muted p-3 rounded-lg mt-2">
+//                         <h4 className="text-sm font-medium mb-1">Notes from Submitter:</h4>
+//                         <p className="text-sm whitespace-pre-line">{selectedSubmission.notes}</p>
+//                       </div>
+//                     )}
+//                     <div className="text-sm text-muted-foreground">
+//                       Submitted on {new Date(selectedSubmission.createdAt).toLocaleString()}
+//                     </div>
+//                   </div>
 //                 </div>
-//               )}
 
-//               <div className="text-sm text-muted-foreground">
-//                 Submitted on {new Date(selectedSubmission.createdAt).toLocaleString()}
+//                 <div className="space-y-2">
+//                   <Label htmlFor="review-status">Review Decision</Label>
+//                   <div className="flex gap-2 flex-col sm:flex-row">
+//                     <Button
+//                       type="button"
+//                       variant={reviewData.status === "Approved" ? "default" : "outline"}
+//                       className={
+//                         reviewData.status === "Approved"
+//                           ? "flex-1 bg-green-600 hover:bg-green-700"
+//                           : "flex-1 border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/30"
+//                       }
+//                       onClick={() => setReviewData({ ...reviewData, status: "Approved" })}
+//                     >
+//                       <ThumbsUp className="mr-2 h-4 w-4" /> Approve
+//                     </Button>
+//                     <Button
+//                       type="button"
+//                       variant={reviewData.status === "Rejected" ? "default" : "outline"}
+//                       className={
+//                         reviewData.status === "Rejected"
+//                           ? "flex-1 bg-red-600 hover:bg-red-700"
+//                           : "flex-1 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
+//                       }
+//                       onClick={() => setReviewData({ ...reviewData, status: "Rejected" })}
+//                     >
+//                       <ThumbsDown className="mr-2 h-4 w-4" /> Reject
+//                     </Button>
+//                   </div>
+//                 </div>
+
+//                 <div className="space-y-2">
+//                   <Label htmlFor="feedback">Feedback (Optional)</Label>
+//                   <Textarea
+//                     id="feedback"
+//                     placeholder="Provide feedback to the submitter..."
+//                     value={reviewData.feedback}
+//                     onChange={(e) => setReviewData({ ...reviewData, feedback: e.target.value })}
+//                     rows={4}
+//                   />
+//                 </div>
 //               </div>
 //             </div>
-//           </div>
+//           )}
 
-//           {/* Review Decision */}
-//           <div className="space-y-2">
-//             <Label htmlFor="review-status">Review Decision</Label>
-//             <div className="flex gap-2 flex-col sm:flex-row">
-//               <Button
-//                 type="button"
-//                 variant={reviewData.status === "Approved" ? "default" : "outline"}
-//                 className={
-//                   reviewData.status === "Approved"
-//                     ? "flex-1 bg-green-600 hover:bg-green-700"
-//                     : "flex-1 border-green-200 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/30"
-//                 }
-//                 onClick={() => setReviewData({ ...reviewData, status: "Approved" })}
-//               >
-//                 <ThumbsUp className="mr-2 h-4 w-4" /> Approve
-//               </Button>
-//               <Button
-//                 type="button"
-//                 variant={reviewData.status === "Rejected" ? "default" : "outline"}
-//                 className={
-//                   reviewData.status === "Rejected"
-//                     ? "flex-1 bg-red-600 hover:bg-red-700"
-//                     : "flex-1 border-red-200 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/30"
-//                 }
-//                 onClick={() => setReviewData({ ...reviewData, status: "Rejected" })}
-//               >
-//                 <ThumbsDown className="mr-2 h-4 w-4" /> Reject
-//               </Button>
-//             </div>
-//           </div>
-
-//           {/* Feedback */}
-//           <div className="space-y-2">
-//             <Label htmlFor="feedback">Feedback (Optional)</Label>
-//             <Textarea
-//               id="feedback"
-//               placeholder="Provide feedback to the submitter..."
-//               value={reviewData.feedback}
-//               onChange={(e) => setReviewData({ ...reviewData, feedback: e.target.value })}
-//               rows={4}
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     )}
-
-//     <DialogFooter>
-//       <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
-//         Cancel
-//       </Button>
-//       <Button onClick={handleReviewSubmission} disabled={isLoading}>
-//         {isLoading ? (
-//           <>
-//             <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
-//           </>
-//         ) : (
-//           <>Submit Review</>
-//         )}
-//       </Button>
-//     </DialogFooter>
-//   </DialogContent>
-// </Dialog>
-
+//           <DialogFooter>
+//             <Button variant="outline" onClick={() => setReviewDialogOpen(false)}>
+//               Cancel
+//             </Button>
+//             <Button onClick={handleReviewSubmission} disabled={isLoading}>
+//               {isLoading ? (
+//                 <>
+//                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...
+//                 </>
+//               ) : (
+//                 <>Submit Review</>
+//               )}
+//             </Button>
+//           </DialogFooter>
+//         </DialogContent>
+//       </Dialog>
 //     </div>
 //   )
 // }
@@ -900,6 +962,7 @@ const CompletedTasks = () => {
       })
 
       setReviewDialogOpen(false)
+      setReviewData({ status: "Approved", feedback: "" })
       fetchData()
     } catch (error) {
       console.error("Error reviewing submission:", error)
@@ -1208,16 +1271,17 @@ const CompletedTasks = () => {
                         <Button variant="outline" size="sm" onClick={() => navigate(`/tasks/${task._id}`)} className="h-8">
                           View Details
                         </Button>
-                        {submission && submission.status === "Pending" && (
+                        {submission && (
                           <Button
                             size="sm"
                             className="h-8"
                             onClick={() => {
                               setSelectedSubmission(submission)
+                              setReviewData({ status: submission.status || "Approved", feedback: submission.feedback || "" })
                               setReviewDialogOpen(true)
                             }}
                           >
-                            Review
+                            {submission.status === "Pending" ? "Review" : "Re-review"}
                           </Button>
                         )}
                       </div>
@@ -1330,16 +1394,17 @@ const CompletedTasks = () => {
                                 >
                                   View
                                 </Button>
-                                {submission && submission.status === "Pending" && (
+                                {submission && (
                                   <Button
                                     size="sm"
                                     className="h-8"
                                     onClick={() => {
                                       setSelectedSubmission(submission)
+                                      setReviewData({ status: submission.status || "Approved", feedback: submission.feedback || "" })
                                       setReviewDialogOpen(true)
                                     }}
                                   >
-                                    Review
+                                    {submission.status === "Pending" ? "Review" : "Re-review"}
                                   </Button>
                                 )}
                               </div>
@@ -1481,18 +1546,17 @@ const CompletedTasks = () => {
                                     View Task
                                   </Button>
                                 )}
-                                {submission.status === "Pending" && (
-                                  <Button
-                                    size="sm"
-                                    className="h-8"
-                                    onClick={() => {
-                                      setSelectedSubmission(submission)
-                                      setReviewDialogOpen(true)
-                                    }}
-                                  >
-                                    Review
-                                  </Button>
-                                )}
+                                <Button
+                                  size="sm"
+                                  className="h-8"
+                                  onClick={() => {
+                                    setSelectedSubmission(submission)
+                                    setReviewData({ status: submission.status || "Approved", feedback: submission.feedback || "" })
+                                    setReviewDialogOpen(true)
+                                  }}
+                                >
+                                  {submission.status === "Pending" ? "Review" : "Re-review"}
+                                </Button>
                               </div>
                             </td>
                           </tr>
@@ -1509,8 +1573,8 @@ const CompletedTasks = () => {
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen} className="dialog-overlay">
         <DialogContent className="dialog-content sm:max-w-[525px] max-w-full sm:max-w-[525px] w-[90vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Review Task Submission</DialogTitle>
-            <DialogDescription>Review and provide feedback on this task submission.</DialogDescription>
+            <DialogTitle>{selectedSubmission?.status === "Pending" ? "Review Task Submission" : "Re-review Task Submission"}</DialogTitle>
+            <DialogDescription>Review or update the feedback for this task submission.</DialogDescription>
           </DialogHeader>
 
           {selectedSubmission && (
@@ -1582,6 +1646,28 @@ const CompletedTasks = () => {
                     </div>
                   </div>
                 </div>
+
+                {selectedSubmission.reviewHistory && selectedSubmission.reviewHistory.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Review History</h3>
+                    <div className="space-y-3">
+                      {selectedSubmission.reviewHistory.map((review, index) => (
+                        <div key={index} className="bg-muted p-3 rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">{review.status}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(review.reviewedAt).toLocaleString()}
+                            </span>
+                          </div>
+                          <p className="text-sm mt-1">By: {review.reviewedBy?.name || "Unknown"}</p>
+                          {review.feedback && (
+                            <p className="text-sm mt-1">Feedback: {review.feedback}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="review-status">Review Decision</Label>
