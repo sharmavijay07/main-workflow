@@ -315,13 +315,10 @@
 
 // module.exports = router
 
-
-
 const express = require("express")
 const router = express.Router()
 const TaskSubmission = require("../models/TaskSubmission")
 const Task = require("../models/Task")
-const auth = require("../middleware/auth")
 const multer = require("multer")
 const { uploadToCloudinary } = require("../utils/cloudinary")
 const Notification = require("../models/Notification")
@@ -356,8 +353,8 @@ const upload = multer({
   },
 })
 
-// Get all submissions (admin only)
-router.get("/", auth, async (req, res) => {
+// Get all submissions
+router.get("/", async (req, res) => {
   try {
     const submissions = await TaskSubmission.find()
       .populate("task", "title status")
@@ -372,7 +369,7 @@ router.get("/", auth, async (req, res) => {
 })
 
 // Get submission by ID
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const submission = await TaskSubmission.findById(req.params.id)
       .populate("task", "title status department assignee")
@@ -391,7 +388,7 @@ router.get("/:id", auth, async (req, res) => {
 })
 
 // Get submission by task ID
-router.get("/task/:taskId", auth, async (req, res) => {
+router.get("/task/:taskId", async (req, res) => {
   try {
     const submission = await TaskSubmission.findOne({ task: req.params.taskId })
       .populate("task", "title status")
@@ -410,7 +407,7 @@ router.get("/task/:taskId", auth, async (req, res) => {
 })
 
 // Create new submission
-router.post("/", auth, upload.single("document"), async (req, res) => {
+router.post("/", upload.single("document"), async (req, res) => {
   try {
     const { task: taskId, githubLink, notes, originalSubmission, userId } = req.body
 
@@ -449,7 +446,7 @@ router.post("/", auth, upload.single("document"), async (req, res) => {
     // Create new submission
     const newSubmission = new TaskSubmission({
       task: taskId,
-      user: userId || req.user.id,
+      user: userId,
       githubLink: githubLink || "",
       notes: notes || "",
       documentLink,
@@ -495,7 +492,7 @@ router.post("/", auth, upload.single("document"), async (req, res) => {
 })
 
 // Update submission
-router.put("/:id", auth, upload.single("document"), async (req, res) => {
+router.put("/:id", upload.single("document"), async (req, res) => {
   try {
     const { githubLink, notes } = req.body
     const submission = await TaskSubmission.findById(req.params.id)
@@ -546,13 +543,17 @@ router.put("/:id", auth, upload.single("document"), async (req, res) => {
   }
 })
 
-// Review submission (admin/manager only)
-router.put("/:id/review", auth, async (req, res) => {
+// Review submission
+router.put("/:id/review", async (req, res) => {
   try {
-    const { status, feedback } = req.body
+    const { status, feedback, reviewedBy } = req.body
 
     if (!status || !["Approved", "Rejected"].includes(status)) {
       return res.status(400).json({ error: "Invalid status" })
+    }
+
+    if (!reviewedBy) {
+      return res.status(400).json({ error: "Reviewer ID is required" })
     }
 
     const submission = await TaskSubmission.findById(req.params.id)
@@ -565,7 +566,7 @@ router.put("/:id/review", auth, async (req, res) => {
       submission.reviewHistory.push({
         status: submission.status,
         feedback: submission.feedback,
-        reviewedBy: req.user.id,
+        reviewedBy: reviewedBy,
         reviewedAt: new Date(),
       })
     }
@@ -605,16 +606,12 @@ router.put("/:id/review", auth, async (req, res) => {
 })
 
 // Delete submission
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const submission = await TaskSubmission.findById(req.params.id)
 
     if (!submission) {
       return res.status(404).json({ error: "Submission not found" })
-    }
-
-    if (submission.user.toString() !== req.user.id && req.user.role !== "Admin") {
-      return res.status(403).json({ error: "Not authorized" })
     }
 
     await TaskSubmission.findByIdAndDelete(req.params.id)
@@ -630,4 +627,3 @@ router.delete("/:id", auth, async (req, res) => {
 })
 
 module.exports = router
-
