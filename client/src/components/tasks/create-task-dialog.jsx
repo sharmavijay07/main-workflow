@@ -1,14 +1,6 @@
 
 
-
-
-
 // import { toast } from "react-toastify";
-
-
-
-// "use client";
-
 // import { useState, useEffect } from "react";
 // import axios from "axios";
 // import { API_URL } from "@/lib/api";
@@ -33,13 +25,10 @@
 //   SelectValue,
 // } from "../ui/select";
 // import { isValid, parse } from "date-fns";
-// // Remove unused import
-// // import { ToastContainer } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 // import { useAuth } from "@/context/auth-context";
 
 // export function CreateTaskDialog({ open, onOpenChange }) {
-
 //   const { user } = useAuth();
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [departments, setDepartments] = useState([]);
@@ -49,6 +38,7 @@
 //   const [documentFile, setDocumentFile] = useState(null);
 //   const [dueDate, setDueDate] = useState("");
 //   const [dateError, setDateError] = useState("");
+//   const [assigneeSearch, setAssigneeSearch] = useState("");
 
 //   const [formData, setFormData] = useState({
 //     title: "",
@@ -75,6 +65,7 @@
 //       setDocumentFile(null);
 //       setDateError("");
 //       setFilteredUsers([]);
+//       setAssigneeSearch("");
 
 //       const fetchData = async () => {
 //         try {
@@ -95,14 +86,39 @@
 
 //       fetchData();
 //     }
-//   }, [open, toast]);
+//   }, [open]);
 
 //   const handleDepartmentChange = (departmentId) => {
 //     setFormData((prev) => ({ ...prev, department: departmentId, assignee: "" }));
+//     setAssigneeSearch("");
 //     const usersInDepartment = allUsers.filter(
 //       (user) => user.department?._id === departmentId
 //     );
 //     setFilteredUsers(usersInDepartment);
+//   };
+
+//   const handleAssigneeSearch = (e) => {
+//     const searchValue = e.target.value;
+//     setAssigneeSearch(searchValue);
+    
+//     const usersInDepartment = allUsers.filter(
+//       (user) => user.department?._id === formData.department
+//     );
+    
+//     if (searchValue.trim() === "") {
+//       setFilteredUsers(usersInDepartment);
+//     } else {
+//       const filtered = usersInDepartment.filter((user) =>
+//         user.name.toLowerCase().includes(searchValue.toLowerCase())
+//       );
+//       setFilteredUsers(filtered);
+//     }
+//   };
+
+//   const handleAssigneeSelect = (user) => {
+//     setFormData((prev) => ({ ...prev, assignee: user._id }));
+//     setAssigneeSearch(user.name);
+//     setFilteredUsers([]); // Clear filtered users after selection
 //   };
 
 //   const handleChange = (field, value) => {
@@ -231,8 +247,7 @@
 
 //   return (
 //     <Dialog open={open} onOpenChange={onOpenChange} className="dialog-overlay">
-//       <DialogContent className="dialog-content sm:max-w-[525px]  max-h-[80vh] overflow-y-auto">
-
+//       <DialogContent className="dialog-content sm:max-w-[525px] max-h-[80vh] overflow-y-auto">
 //         <DialogHeader>
 //           <DialogTitle>Create New Task</DialogTitle>
 //           <DialogDescription>Add a new task to your workflow management system</DialogDescription>
@@ -283,7 +298,7 @@
 //                 <SelectTrigger id="department" className="bg-white border-gray-300">
 //                   <SelectValue placeholder="Select department" />
 //                 </SelectTrigger>
-//                 <SelectContent className="bg-white border-gray-300">
+//                 <SelectContent className="bg-white border-gray-300 max-h-60 overflow-y-auto">
 //                   {departments.map((dept) => (
 //                     <SelectItem key={dept._id} value={dept._id}>
 //                       {dept.name}
@@ -294,39 +309,34 @@
 //             </div>
 
 //             <div className="grid gap-2">
-//               <Label htmlFor="assignee">
+//               <Label htmlFor="assignee-search">
 //                 Assignee <span className="text-red-500">*</span>
 //               </Label>
-//               <Select
-//                 value={formData.assignee}
-//                 onValueChange={(value) => handleChange("assignee", value)}
-//                 disabled={!formData.department || filteredUsers.length === 0}
-//               >
-//                 <SelectTrigger id="assignee" className="bg-white border-gray-300">
-//                   <SelectValue
-//                     placeholder={
-//                       !formData.department
-//                         ? "Select a department first"
-//                         : filteredUsers.length === 0
-//                         ? "No users available"
-//                         : "Select assignee"
-//                     }
-//                   />
-//                 </SelectTrigger>
-//                 <SelectContent className="bg-white border-gray-300">
-//                   {filteredUsers.length > 0 ? (
-//                     filteredUsers.map((user) => (
-//                       <SelectItem key={user._id} value={user._id}>
-//                         {user.name}
-//                       </SelectItem>
-//                     ))
-//                   ) : (
-//                     <div className="px-4 py-2 text-sm text-gray-500">
-//                       No users available
+//               <Input
+//                 id="assignee-search"
+//                 placeholder="Search assignees..."
+//                 value={assigneeSearch}
+//                 onChange={handleAssigneeSearch}
+//                 disabled={!formData.department}
+//               />
+//               {filteredUsers.length > 0 && formData.department && (
+//                 <div className="bg-white border border-gray-300 rounded-md max-h-60 overflow-y-auto">
+//                   {filteredUsers.map((user) => (
+//                     <div
+//                       key={user._id}
+//                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+//                       onClick={() => handleAssigneeSelect(user)}
+//                     >
+//                       {user.name}
 //                     </div>
-//                   )}
-//                 </SelectContent>
-//               </Select>
+//                   ))}
+//                 </div>
+//               )}
+//               {formData.department && filteredUsers.length === 0 && assigneeSearch && !formData.assignee && (
+//                 <div className="px-4 py-2 text-sm text-gray-500">
+//                   No users found
+//                 </div>
+//               )}
 //             </div>
 //           </div>
 
@@ -371,7 +381,7 @@
 //               <SelectTrigger id="dependencies" className="bg-white border-gray-300">
 //                 <SelectValue placeholder="Select dependent tasks" />
 //               </SelectTrigger>
-//               <SelectContent className="bg-white border-gray-300">
+//               <SelectContent className="bg-white border-gray-300 max-h-60 overflow-y-auto">
 //                 {tasks.map((task) => (
 //                   <SelectItem key={task._id} value={task._id}>
 //                     {task.title}
@@ -393,8 +403,6 @@
 //               <p className="text-sm text-muted-foreground">Selected: {documentFile.name}</p>
 //             )}
 //           </div>
-
-      
 //         </div>
 //         <DialogFooter>
 //           <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -408,6 +416,7 @@
 //     </Dialog>
 //   );
 // }
+
 
 
 import { toast } from "react-toastify";
@@ -502,7 +511,7 @@ export function CreateTaskDialog({ open, onOpenChange }) {
     setFormData((prev) => ({ ...prev, department: departmentId, assignee: "" }));
     setAssigneeSearch("");
     const usersInDepartment = allUsers.filter(
-      (user) => user.department?._id === departmentId
+      (user) => user.department?._id === departmentId && user.email?.startsWith("blackholeinfiverse")
     );
     setFilteredUsers(usersInDepartment);
   };
@@ -512,7 +521,7 @@ export function CreateTaskDialog({ open, onOpenChange }) {
     setAssigneeSearch(searchValue);
     
     const usersInDepartment = allUsers.filter(
-      (user) => user.department?._id === formData.department
+      (user) => user.department?._id === formData.department && user.email?.startsWith("blackholeinfiverse")
     );
     
     if (searchValue.trim() === "") {
@@ -734,12 +743,12 @@ export function CreateTaskDialog({ open, onOpenChange }) {
                   {filteredUsers.map((user) => (
                     <div
                       key={user._id}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm flex items-center"
                       onClick={() => handleAssigneeSelect(user)}
                     >
                       {user.name}
                     </div>
-                  ))}
+                    ))}
                 </div>
               )}
               {formData.department && filteredUsers.length === 0 && assigneeSearch && !formData.assignee && (
