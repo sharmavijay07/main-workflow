@@ -1,3 +1,4 @@
+
 // const mongoose = require("mongoose")
 
 // const TaskSubmissionSchema = new mongoose.Schema({
@@ -13,7 +14,6 @@
 //   },
 //   githubLink: {
 //     type: String,
-//     required: true,
 //     trim: true,
 //   },
 //   additionalLinks: {
@@ -22,6 +22,14 @@
 //   },
 //   notes: {
 //     type: String,
+//   },
+//   documentLink: {
+//     type: String,
+//     trim: true,
+//   },
+//   fileType: {
+//     type: String,
+//     trim: true,
 //   },
 //   status: {
 //     type: String,
@@ -48,7 +56,6 @@
 // })
 
 // module.exports = mongoose.model("TaskSubmission", TaskSubmissionSchema)
-
 
 
 
@@ -92,6 +99,25 @@ const TaskSubmissionSchema = new mongoose.Schema({
   feedback: {
     type: String,
   },
+  reviewHistory: [{
+    status: {
+      type: String,
+      enum: ["Approved", "Rejected"],
+      required: true,
+    },
+    feedback: {
+      type: String,
+      default: "",
+    },
+    reviewedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    reviewedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  }],
   createdAt: {
     type: Date,
     default: Date.now,
