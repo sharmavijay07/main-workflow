@@ -6,6 +6,8 @@
 // const auth = require("../middleware/auth")
 // const multer = require("multer")
 // const { uploadToCloudinary } = require("../utils/cloudinary")
+// const Notification = require("../models/Notification")
+// const User = require("../models/User")
 
 // // Configure multer for memory storage
 // const upload = multer({
@@ -152,22 +154,37 @@
 //       originalSubmission: originalSubmission ? originalSubmission : undefined,
 //     })
 
-//     const submission = await newSubmission.save()
+//     const submission = await newSubmission.save();
+
+//     // Populate user information
+//     await submission.populate('user', 'name');
 
 //     // Update task status to "Completed" only for original submission
 //     if (!originalSubmission && task.status !== "Completed") {
-//       task.status = "Completed"
-//       task.progress = 100
-//       await task.save()
+//       task.status = "Completed";
+//       task.progress = 100;
+//       await task.save();
 //     }
 
 //     // Emit socket event for real-time updates
 //     req.io.emit("submission-created", {
 //       submission,
 //       taskId,
-//     })
+//     });
 
-//     res.status(201).json(submission)
+//     // Find admin user(s) to notify
+//     const admins = await User.find({ role: "Admin" });
+//     for (const admin of admins) {
+//       await Notification.create({
+//         recipient: admin._id,
+//         type: "task_submitted",
+//         title: "Task Submitted",
+//         message: `Submission by ${submission.user.name} for task: '${task.title}'. Please review it.`,
+//         task: taskId,
+//       });
+//     }
+
+//     res.status(201).json(submission);
 //   } catch (error) {
 //     console.error("Error creating submission:", error)
 //     res.status(500).json({ error: error.message || "Server error" })
@@ -335,29 +352,17 @@ const upload = multer({
       return cb(new Error("Only PDF, DOC, DOCX, PNG, and JPEG files are allowed"))
     }
 
-    // Validate file content for HTML (not used here, but keeping for consistency)
-    if (file.mimetype === "text/html") {
-      if (!file.buffer) {
-        console.error(`No buffer for file: originalname=${file.originalname}`)
-        return cb(new Error("File buffer is missing"))
-      }
-      const content = file.buffer.toString("utf8", 0, 100)
-      if (!content.startsWith("<!DOCTYPE html")) {
-        console.error(`Invalid HTML content for file: originalname=${file.originalname}`)
-        return cb(new Error("Invalid HTML file"))
-      }
-    }
-
     cb(null, true)
   },
 })
 
 // Get all submissions (admin only)
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const submissions = await TaskSubmission.find()
       .populate("task", "title status")
       .populate("user", "name email")
+      .populate("reviewHistory.reviewedBy", "name email")
 
     res.json(submissions)
   } catch (error) {
@@ -367,11 +372,12 @@ router.get("/", async (req, res) => {
 })
 
 // Get submission by ID
-router.get("/:id", async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   try {
     const submission = await TaskSubmission.findById(req.params.id)
       .populate("task", "title status department assignee")
       .populate("user", "name email")
+      .populate("reviewHistory.reviewedBy", "name email")
 
     if (!submission) {
       return res.status(404).json({ error: "Submission not found" })
@@ -385,11 +391,12 @@ router.get("/:id", async (req, res) => {
 })
 
 // Get submission by task ID
-router.get("/task/:taskId", async (req, res) => {
+router.get("/task/:taskId", auth, async (req, res) => {
   try {
     const submission = await TaskSubmission.findOne({ task: req.params.taskId })
       .populate("task", "title status")
       .populate("user", "name email")
+      .populate("reviewHistory.reviewedBy", "name email")
 
     if (!submission) {
       return res.status(404).json({ error: "Submission not found" })
@@ -403,20 +410,15 @@ router.get("/task/:taskId", async (req, res) => {
 })
 
 // Create new submission
-router.post("/",upload.single("document"), async (req, res) => {
+router.post("/", auth, upload.single("document"), async (req, res) => {
   try {
-    const { task: taskId, githubLink, notes, originalSubmission,userId } = req.body
+    const { task: taskId, githubLink, notes, originalSubmission, userId } = req.body
 
     // Check if task exists
     const task = await Task.findById(taskId)
     if (!task) {
       return res.status(404).json({ error: "Task not found" })
     }
-
-    // // Check if user is assigned to this task
-    // if (task.assignee.toString() !== req.user.id) {
-    //   return res.status(403).json({ error: "You can only submit tasks assigned to you" })
-    // }
 
     // If it's an original submission (not a revision)
     if (!originalSubmission) {
@@ -447,7 +449,7 @@ router.post("/",upload.single("document"), async (req, res) => {
     // Create new submission
     const newSubmission = new TaskSubmission({
       task: taskId,
-      user: userId,
+      user: userId || req.user.id,
       githubLink: githubLink || "",
       notes: notes || "",
       documentLink,
@@ -455,26 +457,26 @@ router.post("/",upload.single("document"), async (req, res) => {
       originalSubmission: originalSubmission ? originalSubmission : undefined,
     })
 
-    const submission = await newSubmission.save();
+    const submission = await newSubmission.save()
 
     // Populate user information
-    await submission.populate('user', 'name');
+    await submission.populate("user", "name")
 
     // Update task status to "Completed" only for original submission
     if (!originalSubmission && task.status !== "Completed") {
-      task.status = "Completed";
-      task.progress = 100;
-      await task.save();
+      task.status = "Completed"
+      task.progress = 100
+      await task.save()
     }
 
     // Emit socket event for real-time updates
     req.io.emit("submission-created", {
       submission,
       taskId,
-    });
+    })
 
     // Find admin user(s) to notify
-    const admins = await User.find({ role: "Admin" });
+    const admins = await User.find({ role: "Admin" })
     for (const admin of admins) {
       await Notification.create({
         recipient: admin._id,
@@ -482,10 +484,10 @@ router.post("/",upload.single("document"), async (req, res) => {
         title: "Task Submitted",
         message: `Submission by ${submission.user.name} for task: '${task.title}'. Please review it.`,
         task: taskId,
-      });
+      })
     }
 
-    res.status(201).json(submission);
+    res.status(201).json(submission)
   } catch (error) {
     console.error("Error creating submission:", error)
     res.status(500).json({ error: error.message || "Server error" })
@@ -493,7 +495,7 @@ router.post("/",upload.single("document"), async (req, res) => {
 })
 
 // Update submission
-router.put("/:id", upload.single("document"), async (req, res) => {
+router.put("/:id", auth, upload.single("document"), async (req, res) => {
   try {
     const { githubLink, notes } = req.body
     const submission = await TaskSubmission.findById(req.params.id)
@@ -501,11 +503,6 @@ router.put("/:id", upload.single("document"), async (req, res) => {
     if (!submission) {
       return res.status(404).json({ error: "Submission not found" })
     }
-
-    // // Check if user is authorized to update this submission
-    // if (submission.user.toString() !== req.user.id && req.user.role !== "Admin") {
-    //   return res.status(403).json({ error: "Not authorized" })
-    // }
 
     let documentLink = submission.documentLink
     let fileType = submission.fileType
@@ -537,6 +534,7 @@ router.put("/:id", upload.single("document"), async (req, res) => {
     )
       .populate("task", "title status")
       .populate("user", "name email")
+      .populate("reviewHistory.reviewedBy", "name email")
 
     // Emit socket event for real-time updates
     req.io.emit("submission-updated", updatedSubmission)
@@ -549,7 +547,7 @@ router.put("/:id", upload.single("document"), async (req, res) => {
 })
 
 // Review submission (admin/manager only)
-router.put("/:id/review", async (req, res) => {
+router.put("/:id/review", auth, async (req, res) => {
   try {
     const { status, feedback } = req.body
 
@@ -558,14 +556,23 @@ router.put("/:id/review", async (req, res) => {
     }
 
     const submission = await TaskSubmission.findById(req.params.id)
-
     if (!submission) {
       return res.status(404).json({ error: "Submission not found" })
     }
 
-    // Update submission status and feedback
+    // Add current review to history
+    if (submission.status !== "Pending") {
+      submission.reviewHistory.push({
+        status: submission.status,
+        feedback: submission.feedback,
+        reviewedBy: req.user.id,
+        reviewedAt: new Date(),
+      })
+    }
+
+    // Update current status and feedback
     submission.status = status
-    submission.feedback = feedback
+    submission.feedback = feedback || ""
     await submission.save()
 
     // If approved, ensure task is marked as completed
@@ -581,6 +588,15 @@ router.put("/:id/review", async (req, res) => {
     // Emit socket event for real-time updates
     req.io.emit("submission-reviewed", submission)
 
+    // Notify the submitter
+    await Notification.create({
+      recipient: submission.user,
+      type: "submission_reviewed",
+      title: `Submission ${status}`,
+      message: `Your submission for task '${submission.task.title}' has been ${status.toLowerCase()}. Feedback: ${feedback || "None"}`,
+      task: submission.task,
+    })
+
     res.json(submission)
   } catch (error) {
     console.error("Error reviewing submission:", error)
@@ -589,7 +605,7 @@ router.put("/:id/review", async (req, res) => {
 })
 
 // Delete submission
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   try {
     const submission = await TaskSubmission.findById(req.params.id)
 
@@ -597,7 +613,6 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Submission not found" })
     }
 
-    // Check if user is authorized to delete this submission
     if (submission.user.toString() !== req.user.id && req.user.role !== "Admin") {
       return res.status(403).json({ error: "Not authorized" })
     }
@@ -615,6 +630,4 @@ router.delete("/:id", async (req, res) => {
 })
 
 module.exports = router
-
-
 
